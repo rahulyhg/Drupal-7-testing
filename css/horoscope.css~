@@ -1,0 +1,63 @@
+#horoscope.horoscope-block {
+    width : 190px; /* width here */
+    height : 240px; /* height here */
+}
+#horoscope.horoscope-block p{
+    float:left;
+    padding:0;
+    margin:0px;
+    /*erase this in final module*/    
+    width:85px;
+    height:30px;
+    background:none;/*#eFd8fd;*/
+    border-radius: 5px; 
+    -moz-border-radius: 5px; 
+    -webkit-border-radius: 5px; 
+    border: 0px solid #800000;	
+    margin: 5px;
+}
+#horoscope.horoscope-date p{
+    float:right;
+    padding:0;
+    margin:0px;
+    background:none;/*#ddf1fd;*/
+    border-radius: 5px; 
+    -moz-border-radius: 5px; 
+    -webkit-border-radius: 5px; 
+    border: 0px solid #800000;	
+    margin:0px;
+}
+#horoscope.horoscope-text p{
+    float:left;
+    padding:0;
+    margin:0px;
+   /*erase this in final module*/    
+    background:none;
+    border-radius: 5px; 
+    -moz-border-radius: 5px; 
+    -webkit-border-radius: 5px; 
+    border: 0px solid #800000;	
+    margin:0px;
+}
+#horoscope.horoscope-hlink li{
+    float:right;
+    padding:0;
+    margin:0px;
+    text-align:center;
+    /*erase this in final module*/   
+    width:160px; 
+    height:30px;
+    background:none;/*#e4d8fd;*/
+    border-radius: 5px; 
+    -moz-border-radius: 5px; 
+    -webkit-border-radius: 5px; 
+    border: 0px solid #800000;	
+    margin: 5px;
+}
+.name-tfield{
+   margin:20px;
+   display:inline;
+}
+.form-item label {
+  display:inline;
+}

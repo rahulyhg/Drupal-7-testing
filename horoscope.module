@@ -1,0 +1,262 @@
+<?php 
+ module_load_include('inc', 'horoscope', 'admin');
+ module_load_include('inc', 'horoscope', 'admin.forms');
+
+/**
+ * Implementation of hook_block_info()
+ */
+ 
+ function horoscope_block_info(){
+   $blocks['horoscope-list'] = array(
+     'info' => t('Horoscope List')
+   );
+   return $blocks;
+ }
+
+/**
+ * Implementation of hook_block_view()
+ */
+
+ function horoscope_block_view($delta){
+   $block = array();
+   switch ($delta) {
+     case 'horoscope-list':
+       $block['subject']=t('Horoscope');
+       $block['content']=theme('horoscope-block');
+     break;
+   }         
+   return $block;
+ } 
+ 
+/**
+ * Implementation of hook_theme().
+ */
+
+ function horoscope_theme(){
+   $theme = array();
+   $path = drupal_get_path('module', 'horoscope');
+   $path .='/templates';
+   $theme['horoscope-block'] = array(
+     'template' => 'horoscope',
+     'path' => $path
+   );
+   $theme['get-horoscope'] = array (
+     'variables' => array('sign' => NULL, 'get' => NULL),
+     'template' => 'get-text',
+     'path' => $path
+   ); 
+   $theme['get-sign-detail'] = array (
+     'variables' => array('sign' => NULL),
+     'template' => 'get-sign',
+     'path' => $path
+   ); 
+   $theme['get-birth-sign'] = array (
+     'variables' => array('sign' => NULL),
+     'template' => 'get-dob-sign',
+     'path' => $path
+   ); 
+   return $theme;
+ }
+
+/**
+ * Implementation of hook_menu().
+ */
+
+ function horoscope_menu() {
+   $items = array();
+   $items['admin/config/horoscope'] = array(
+     'title' => 'Horoscope',
+     'position' => 'left',
+     'weight' => -100,
+     'page callback' => 'system_admin_menu_block_page',
+     'access arguments' => array('administer site configuration'),
+     'file' => 'system.admin.inc',
+     'file path' => drupal_get_path('module', 'system'),
+   );
+   $items['admin/config/horoscope/list'] = array(
+     'title' => 'List horoscope',
+     'description' => t('Settings for Horoscope.'), 
+     'page callback' => '_horoscope_list', 
+     'access arguments' => array('administer content types'), 
+   );   
+   $items['admin/config/horoscope/add'] = array(
+     'title' => 'Add horoscope',
+     'description' => t('Add different horoscope if needed.'),
+     'page callback' => 'drupal_get_form',  
+     'page arguments' => array('horoscope_add_form'),  
+     'access arguments' => array('administer content types'),
+   );
+   $items['admin/config/horoscope/list/%'] = array(
+     'title' => 'List Horoscope Signs',
+     'description' => t('Return horoscope.'),
+     'page callback' => '_horoscope_list_signs',  
+     'page arguments' => array(4),  
+     'access arguments' => array('administer content types'), 
+   );
+   $items['admin/config/horoscope/list/%/edit'] = array(
+     'title' => 'Edit horoscope',
+     'description' => t('Edit horoscope.'),
+     'page callback' => 'drupal_get_form',  
+     'page arguments' => array('horoscope_edit_form', 4),  
+     'access arguments' => array('administer content types'),
+   );
+   $items['admin/config/horoscope/list/%/add_sign'] = array(
+     'title' => 'Add Sign',
+     'description' => t('Add sign in horoscope.'),
+     'page callback' => 'drupal_get_form',  
+     'page arguments' => array('horoscope_add_sign_form', 4),  
+     'access arguments' => array('administer content types'),
+   );
+   $items['admin/config/horoscope/list/%/delete'] = array(
+     'title' => 'Delete Horoscope',
+     'description' => t('Delete horoscope.'),
+     'page callback' => 'drupal_get_form',  
+     'page arguments' => array('horoscope_delete_form', 4),  
+     'access arguments' => array('administer content types'),
+   );
+   $items['admin/config/horoscope/list/%/%/edit'] = array(
+     'title' => 'Edit Sign',
+     'description' => t('Edit horoscope sign.'),
+     'page callback' => 'drupal_get_form',  
+     'page arguments' => array('horoscope_edit_sign_form', 5),  
+     'access arguments' => array('administer content types'),
+   );
+   $items['admin/config/horoscope/list/%/%/delete'] = array(
+     'title' => 'Delete Sign',
+     'description' => t('Delete horoscope sign.'),
+     'page callback' => 'drupal_get_form',  
+     'page arguments' => array('horoscope_delete_sign_form', 5),  
+     'access arguments' => array('administer content types'),
+   );
+   $items['admin/config/horoscope/list/%/%/add_text'] = array(
+     'title' => 'Add Text',
+     'description' => t('Add text for horoscope sign.'),
+     'page callback' => 'drupal_get_form',  
+     'page arguments' => array('horoscope_add_text_form',4, 5),  
+     'access arguments' => array('administer content types'),
+   );
+   $items['admin/config/horoscope/list/%/list_text'] = array(
+     'title' => 'List Text',
+     'description' => t('List text for horoscope sign.'),
+     'page callback' => '_horoscope_list_text',  
+     'page arguments' => array(4),  
+     'access arguments' => array('administer content types'),
+   );
+   $items['admin/config/horoscope/sign/%/edit_text'] = array(
+     'title' => 'Edit Text',
+     'description' => t('Edit text for horoscope sign.'),
+     'page callback' => 'horoscope_sign_edit_text',  
+     'page arguments' => array(4),  
+     'access arguments' => array('administer content types'), 
+   );
+   $items['admin/config/horoscope/list_text/%/edit_text'] = array(
+     'title' => 'Edit Text',
+     'description' => t('Edit text for horoscope sign.'),
+     'page callback' => 'drupal_get_form',  
+     'page arguments' => array('horoscope_edit_text_form',4),  
+     'access arguments' => array('administer content types'), 
+   );    
+   $items['horoscope/%/day'] = array(
+     'title' => 'Horoscope for Today',
+     'description' => 'Return daily horoscope.',
+     'page callback' => '_get_horoscope',
+     'page arguments' => array(1, 2),  
+     'access callback' => TRUE,
+     'type' => MENU_CALLBACK,
+   );
+   $items['horoscope/%/week'] = array(
+     'title' => 'Horoscope for this week',
+     'description' => 'Return weekly horoscope.',
+     'page callback' => '_get_horoscope',
+     'page arguments' => array(1, 2),
+     'access callback' => TRUE,
+     'type' => MENU_CALLBACK,    
+   );
+   $items['horoscope/%/month'] = array(
+     'title' => 'Horoscope for this month',
+     'description' => 'Return monthly horoscope.',
+     'page callback' => '_get_horoscope',
+     'page arguments' => array(1, 2),
+     'access callback' => TRUE,
+     'type' => MENU_CALLBACK,
+   );
+   $items['horoscope/%/year'] = array(
+     'title' => 'Horoscope for this year',
+     'description' => 'Return yearly horoscope.',
+     'page callback' => '_get_horoscope',
+     'page arguments' => array(1, 2),
+     'access callback' => TRUE,
+     'type' => MENU_CALLBACK,
+   );
+   $items['horoscope/%'] = array(
+     'title' => 'About Horoscope Sign',
+     'description' => 'Return details about horoscope sign.',
+     'page callback' => '_get_sign_details',
+     'page arguments' => array(1),
+     'access callback' => TRUE,
+     'type' => MENU_CALLBACK,
+   );
+   $items['horoscope/%/sunsign'] = array(
+     'title' => 'Your Horoscope Sign',
+     'description' => 'Return horoscope sign for specific dob.',
+     'page callback' => '_get_birth_sign',
+     'page arguments' => array(1),
+     'access callback' => TRUE,
+     'type' => MENU_CALLBACK,
+   );
+   $items['horoscope/birth_sign'] = array(
+     'title' => 'Find Your Horoscope Sign',
+     'description' => 'Return particulars horoscope sign.',
+     'page callback' => 'drupal_get_form',  
+     'page arguments' => array('_get_birth_sign_form'),
+     'access callback' => TRUE,
+     'type' => MENU_CALLBACK,
+   );
+   return $items;
+ }
+/*
+ * all template functions.
+ */
+ function _get_birth_sign($arg1) {
+   $content = '';
+   $content =theme('get-birth-sign',array('sign' => $arg1));
+   return $content;
+ }
+
+ function _get_sign_details($arg) {
+   $content = '';
+   $content =theme('get-sign-detail',array('sign' => $arg));
+   return $content;
+ }
+
+ function _get_horoscope($arg2, $arg3) {
+   $content = '';
+   $content =theme('get-horoscope',array('sign' => $arg2,'get' => $arg3));
+   return $content;
+ }
+/*
+ * it will replace the text, when same date found.
+ */
+ function horoscope_sign_edit_text($arg) {
+   $text = variable_get('text',NULL);
+   db_update('horoscope_text')
+     ->fields(array(
+       'text' => $text,
+     ))
+     ->condition('id',$arg, '=')
+     ->execute();
+   drupal_set_message("Data updated !");
+   drupal_goto('admin/config/horoscope/list');
+ }
+
+/**
+ * Query all signs from default horoscope 
+ */
+
+ function query_all_signs($horoscope){
+   $query = db_select('horoscope_signs', 'h')
+     ->fields('h', array('id', 'name', 'icon','horoscope_id','date_range_from','date_range_to'))
+     ->condition('horoscope_id', $horoscope)
+     ->execute();
+   return $query;
+ }
