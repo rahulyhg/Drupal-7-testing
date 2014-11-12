@@ -1,7 +1,0 @@
-(function ($) {
-  Drupal.behaviors.horoscope = {
-    attach: function (context, settings) {
-        $( "#edit-to-date" ).datepicker();    
-      }
-  };
-}(jQuery));

@@ -1,4 +1,0 @@
-name = Horoscope
-description = Provides daily, weekly, monthly, and yearly horoscope for particular horoscope and their associated sign.
-core = 7.x
-configure = admin/config/horoscope
