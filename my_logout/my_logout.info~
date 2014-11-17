@@ -1,0 +1,4 @@
+name = My Lougout
+description = "A trigger that users to add action that will be performed on custom comment "
+core = 7.x
+package = My Lougout

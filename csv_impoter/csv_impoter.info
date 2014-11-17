@@ -1,0 +1,5 @@
+name = Vendor Directories CSV Importer
+package = "Vendor Directories"
+description = Upload and Import CSV file and create node accordingly.
+core = 7.x
+version = "7.x-1.0"

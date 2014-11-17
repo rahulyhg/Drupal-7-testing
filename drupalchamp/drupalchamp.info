@@ -1,0 +1,5 @@
+name = Ubercart Cart Block
+package = "drupalchamp"
+description = It will show the total count and view cart link in uc_cart block.
+core = 7.x
+version = "7.x-1.0"

@@ -1,0 +1,65 @@
+<?php
+/**
+ * intalling schema in database named registration
+ * example (partial) specification for table "registration_tb"
+ */
+ function registration_schema() {
+   $schema['registration_tb'] = array(
+     'description' => 'The base table for nodes.',
+     'fields' => array(
+       'uid' => array(
+         'description' => 'The primary identifier for a testing_tb.',
+         'type' => 'serial',
+         'unsigned' => TRUE,
+         'not null' => TRUE,
+       ),
+       'name' => array(
+         'description' => 'The title of this node, always treated as non-markup plain text.',
+         'type' => 'varchar',
+         'length' => 255,
+         'not null' => TRUE,
+         'default' => '',
+       ),
+       'mob' => array(
+         'description' => 'The title of this node, always treated as non-markup plain text.',
+         'type' => 'varchar',
+         'length' => 255,
+         'not null' => TRUE,
+         'default' => '',
+       ),
+       'email' => array(
+         'description' => 'The title of this node, always treated as non-markup plain text.',
+         'type' => 'varchar',
+         'length' => 255,
+         'not null' => TRUE,
+         'default' => '',
+       ),
+       'password' => array(
+         'description' => 'The title of this node, always treated as non-markup plain text.',
+         'type' => 'varchar',
+         'length' => 255,
+         'not null' => TRUE,
+         'default' => '',
+       ),
+       'gender' => array(
+         'description' => 'The title of this node, always treated as non-markup plain text.',
+         'type' => 'varchar',
+         'length' => 255,
+         'not null' => TRUE,
+         'default' => '',
+       ),
+     ),
+     'primary key' => array('uid'),
+   );
+ return $schema;
+ }
+ function registration_install() {
+   if(db_table_exists('registration_tb') == FALSE) {
+     drupal_install_schema();
+   }
+ }
+ function registration_uninstall() {
+   if(db_table_exists('registration_tb') == TRUE) {
+     drupal_uninstall_schema('registration_tb');
+   }
+ }

@@ -1,0 +1,6 @@
+name = Saml Login
+description = This Module is developed for login to third party site from drupal site.
+core = 7.x
+package = custom
+file[] = "samllogin.module"
+version = 7.31

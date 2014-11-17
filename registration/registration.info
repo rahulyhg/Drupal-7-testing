@@ -1,0 +1,5 @@
+name = Registration
+description = Provides a form where user can register himself on your site.
+core = 7.x
+package = registration
+

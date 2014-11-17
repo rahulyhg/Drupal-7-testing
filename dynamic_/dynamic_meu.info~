@@ -1,0 +1,5 @@
+name = Dynamic Menu title changer
+package = "drupalchamp"
+description = It will change menu title dynamically.
+core = 7.x
+version = "7.x-1.0"

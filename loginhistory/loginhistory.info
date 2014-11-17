@@ -1,0 +1,7 @@
+name = Login History
+description = Keeps track of user logins.
+package = login history
+core = 7.x
+files[] = loginhistory.install
+files[] = loginhistory.module
+

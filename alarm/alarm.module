@@ -1,0 +1,28 @@
+<?php
+/**
+ * @file
+ * Provide a simulated alarm.
+ */
+ function alarm_alarm() {
+   watchdog('alarm', 'alarm!');
+ }
+/**
+ *Implemenation of hook_action_info().
+ */
+ function alarm_action_info() {
+   return array(
+     'alarm_alarm_action' => array(
+       'type' => 'system',
+       'label' => t('alarm annoyingly'),
+       'configurable' => FALSE,
+       'triggers' => array('any'),
+     ),
+   );
+ }
+/**
+ * Simulate a beep. A Drupal action.
+ */
+ function alarm_alarm_action() {
+   alarm_alarm();
+ }
+

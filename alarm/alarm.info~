@@ -1,0 +1,6 @@
+name = alarm
+description = Simulates a system alarm.
+package = alarm
+core = 7.x
+files[] = alarm.module
+

@@ -1,0 +1,50 @@
+<?php
+/**
+ * Implements hook_menu_link_alter().
+ *
+ * @param $item
+ * Associative array defining a menu link as passed into menu_link_save()
+ */
+ function my_logout_menu_link_alter(&$item) {
+ //changing lofout link to sign off.
+   if ($item['link_path'] == 'user/logout') {
+     $item['link_title'] = 'Sign off';
+   }
+ /* Hide the Create content link.
+   if ($item['link_path'] == 'node/add') {
+     $item['hidden'] = '1';
+   }*/
+ }
+/**
+ * Implementation of hook_menu_alter().
+ *
+ * @param array $items
+ * Menu items keyed by path.
+ */
+ function my_logout_menu_alter(&$items) {
+  // Replace the page callback to 'user_logout' with a call to
+  // our own page callback.
+   $items['logout']['page callback'] = 'my_logout_user_logout';
+   $items['logout']['access callback'] = 'user_is_logged_in';
+  // Drupal no longer has to load the user.pages.inc file
+  // since it will be calling our menufun_user_logout(), which
+  // is in our module -- and that's already in scope.
+   unset($items['logout']['file']);
+ }
+/**
+ * Menu callback; logs the current user out, and redirects to drupal.org.
+ * This is a modified version of user_logout().
+ */
+ function my_logout_user_logout() {
+   global $user;
+   watchdog('my_logout', 'Session closed for %name.', array('%name' => $user->name));
+  // Destroy the current session:
+   session_destroy();
+  // Run the 'logout' operation of the user hook so modules can respond
+  // to the logout if they want to.
+   module_invoke_all('user', 'logout', NULL, $user);
+  // Load the anonymous user so the global $user object will be correct    
+  // on any hook_exit() implementations.
+   $user = drupal_anonymous_user();
+   drupal_goto('http://localhost/chandan_dp/');
+ }

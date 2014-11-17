@@ -1,0 +1,23 @@
+<?php
+/**
+ * Implementation of hook_trigger_info().
+ */
+ function my_trigger_trigger_info() {
+   return array(
+     'c_comment' => array(
+       'c_comment_create' => array(
+	  'label' => t('After saving new custom comment'),
+       ),
+	'c_comment_update' => array(
+         'label' => t('After saving updated custom comment'),
+       ),
+       'c_comment_delete' => array(
+         'label' => t('After deleting custom comment'),
+       ),
+       'c_comment_view' => array(
+         'label' => t('When custom comment is viewed by an authenticated user'),
+       ),
+     ),
+   );
+ module_invoke_all ('c_comment_create');
+ }

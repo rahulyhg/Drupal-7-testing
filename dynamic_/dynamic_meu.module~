@@ -1,0 +1,27 @@
+<?php
+/**
+ * Implements hook_menu_alter().
+ */
+function dynamic_menu_menu_alter(&$items) {
+  $items['cart/my']['title callback'] = 'dynamic_menu_item_title';
+}
+/**
+ * Returns the title of the shopping cart menu item with an item count.
+ */
+function dynamic_menu_item_title() {
+  global $user;
+  // Default to a static title.
+  $title = t('my cart');
+  // If the user actually has a cart order...
+  if ($order = commerce_cart_order_load($user->uid)) {
+    // Count the number of product line items on the order.
+    $wrapper = entity_metadata_wrapper('commerce_order', $order);
+    $quantity = commerce_line_items_quantity($wrapper->commerce_line_items, commerce_product_line_item_types());
+    // If there are more than 0 product line items on the order...
+    if ($quantity > 0) {
+      // Use the dynamic menu item title.
+      $title = format_plural($quantity, 'my cart (1 item)', 'my cart (@count items)');
+    }
+  }
+  return $title;
+}

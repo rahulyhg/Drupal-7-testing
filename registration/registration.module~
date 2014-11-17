@@ -1,0 +1,109 @@
+<?php
+/**
+ * Implementation of hook_menu_alter().
+ *
+ * @param array $items
+ * Menu items keyed by path.
+ */
+ function registration_menu() {
+   $items = array();
+     $items['register'] = array(
+       'title' => 'Registration',
+       'page callback' => 'drupal_get_form',
+       'page arguments' => array('registration_form'),
+       'access callback' => TRUE,
+       'access argument' => 'content access',
+     );
+ return $items;
+ }
+ //page argument
+ function registration_form($node, &$form_state) {
+   $form['name'] = array(
+     '#type' => 'textfield',
+     '#title' => 'Name',
+     '#required' => TRUE,
+     '#size' => 40,
+     '#markup' => '<blink>Hello!</blink>',
+     '#attributes'=> array(
+       'placeholder' => t('Enter Your Name'),
+     ),
+   );
+   $form['repass'] = array(
+     '#type' => 'password_confirm', 
+     '#size' => 25,
+     '#required' => TRUE,
+     '#attributes'=> array(
+       'placeholder' => t('Enter Password'),
+     ),
+   );
+   $form['email'] = array(
+     '#type' => 'textfield',
+     '#title' => t('E-mail'),
+     '#size' => 40,
+     '#required' => TRUE,
+     '#attributes'=> array(
+       'placeholder' => t('Enter E-mail'),
+     ),
+   );
+   $form['mob'] = array(
+     '#type' => 'textfield',
+     '#title' => 'Mobile',
+     '#required' => TRUE,
+     '#size' => 40,
+     '#attributes'=> array(
+       'placeholder' => t('7827408743'),
+     ),
+   );
+   $form['gender'] = array(
+     '#type' => 'select',
+     '#title' => t('Gender'),
+     '#options' => array(
+       0 => t('Male'),
+       1 => t('Female'),
+     ),
+   );
+   $form['Ok'] = array(
+     '#type' => 'submit', 
+     '#value' => t('Ok'), 
+   );
+   $form['Clear'] = array(
+     '#type' => 'submit', 
+     '#value' => t('Clear'), 
+     '#submit' => array('db_clear'),
+   );
+ return $form;
+ }
+ //form submit and validation function definition
+ function db_clear($form, &$form_state){
+   $form_state['values']['name']="";
+   $form_state['values']['email']="";
+   $form_state['values']['gender']="";
+   drupal_set_message(t('forms clear!'));
+ }
+ function registration_form_validate($form, &$form_state) {
+   
+ }
+ function registration_form_submit($form, &$form_state) {
+   $hspass=md5($form_state['values']['repass']);
+   $form['#submit'][] = 'send_sms_submit';
+   db_insert('registration_tb')
+     ->fields( array( 
+       'password' => $hspass,//$form_state['values']['repass'],       
+       'email' => $form_state['values']['email'],
+       'name' => $form_state['values']['name'],
+       'gender' => $form_state['values']['gender'],
+       'mob' => $form_state['values']['mob'],
+     ))->execute();
+   variable_set('name',$form_state['values']['name']);
+   variable_set('email',$form_state['values']['email']);
+   variable_set('gender',$form_state['values']['gender']);
+   variable_set('mob',$form_state['values']['mob']);
+ //drupal_set_message(t('Thank you for registration with us!'));//.$form_state['values']));
+   $form_state['redirect'] = 'node/327';
+ //drupal_set_message("Form values: <pre>".print_r($form_state,true)."</pre>"); 
+ }
+//sending sms using mail function of php to the no provede in the registration form.
+ function send_sms_submit($form, &$form_state) {
+	drupal_set_message("your sms has been send to yor no: ".$form_state['values']['mob']);
+   //mail($form_state['values']['mob']."@airtelkk.com", "", "Your packaged has arrived!", "From: David Walsh <david@davidwalsh.name>\r\n");
+ }

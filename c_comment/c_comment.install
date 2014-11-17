@@ -1,0 +1,38 @@
+<?php
+/**
+ * Implements hook_install()
+ */
+ function c_comment_install() {
+ // Check to see if custom comment field exists.
+   $field = field_info_field('c_comment');
+ // if the custom comment field does not exist then create it
+   if (empty($field)) {
+     $field = array(
+       'field_name' => 'c_comment',
+       'type' => 'text_with_summary',
+       'entity_types' => array('node'),
+         'translatable' => TRUE,
+       );
+     $field = field_create_field($field);
+   }
+ }
+/**
+ * Implements hook_uninstall()
+ */
+ function c_comment_uninstall() {
+   watchdog("c_comment Module", "Uninstalling module and deleting fields");
+   $types = node_type_get_types();
+   foreach($types as $type) {
+     c_comment_delete_c_comment($type);
+   }
+   $field = field_info_field('c_comment');
+     if ($field) {
+       field_delete_field('c_comment');
+     }
+ }
+ function c_comment_delete_c_comment($type) {
+   $instance = field_info_instance('node', 'c_comment', $type->type);
+   if ($instance) {
+     field_delete_instance($instance);
+   }
+ }

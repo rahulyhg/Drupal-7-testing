@@ -1,0 +1,38 @@
+<?php
+ function my_content_type_install() {
+   $t = get_t();
+   $my_content_type = array(
+     'type' => 'my_content_type',
+     'name' => $t('my schedule'),
+     'base' => 'node_content',
+     'description' => $t('This is an example node type with a few fields.'),
+     'body_label' => $t('my node Description')
+   );
+   $content_type = node_type_set_defaults($my_content_type);
+   node_add_body_field($content_type);
+ // Check if we create content type or update.
+   $status = node_type_save($content_type);
+ // Replacement rule for the messages.
+   $t_args = array('%name' => $content_type->name);
+   if ($status == SAVED_UPDATED) { // update case
+     drupal_set_message($t('The content type %name has been updated.', $t_args));
+   } 
+   elseif ($status == SAVED_NEW) { // create case
+     drupal_set_message($t('The content type %name has been added.', $t_args));
+     watchdog('node', 'Added content type %name.', $t_args, WATCHDOG_NOTICE, l($t('view'), 'admin/structure/types')); 
+   }
+ }
+ function my_content_type_uninstall() {
+ // Gather all the example content that might have been created while this
+ // module was enabled.  Simple selects still use db_query().
+   $sql = 'SELECT nid FROM {node} n WHERE n.type = :type';
+   $result = db_query($sql, array(':type' => 'my_content_type'));
+   $nids = array();
+   foreach ($result as $row) {
+     $nids[] = $row->nid;
+   }
+ // Delete all the nodes at once
+   node_delete_multiple($nids);
+ // Delete our content type
+   node_type_delete('my_content_type');
+ }

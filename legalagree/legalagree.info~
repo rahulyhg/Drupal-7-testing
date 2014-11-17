@@ -1,0 +1,6 @@
+name = Legal Agreement
+description = Displays a dubious legal agreement during user registration.
+package = Legal Agreement
+core = 7.x
+files[] = legalagree.module
+

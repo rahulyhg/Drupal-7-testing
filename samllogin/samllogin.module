@@ -1,0 +1,251 @@
+<?php
+ module_load_include('inc', 'samllogin', 'admin.forms');
+/**
+ * Implements hook_menu().
+ **/
+function samllogin_menu() {
+  $items = array();
+  $items['admin/config/third-party-link'] = array(
+     'title' => 'Third party credential',
+     'position' => 'left',
+     'weight' => -100,
+     'page callback' => 'system_admin_menu_block_page',
+     'access arguments' => array('administer site configuration'),
+     'file' => 'system.admin.inc',
+     'file path' => drupal_get_path('module', 'system'),
+  );
+  $items['admin/config/third-party-link/smart-office'] = array(
+     'title' => 'Add SmartOffice information',
+     'description' => t('Add SmartOffice information for particular user.'),
+     'page callback' => '_add_smart_office_info',   
+     'access arguments' => array('administer content types'),
+  );
+  $items['admin/config/third-party-link/surance-bay'] = array(
+     'title' => 'Add SuranceBay information',
+     'description' => t('Add SuranceBay information for particular user.'),
+     'page callback' => '_add_surance_bay_info',  
+     'access arguments' => array('administer content types'),
+  );
+  $items['admin/config/third-party-link/%/%/delete'] = array(
+     'title' => 'Remove information',
+     'description' => t('Remove information for particular user.'),
+     'page callback' => 'drupal_get_form',  
+     'page arguments' => array('remove_third_party_info_form',3,4),  
+     'access arguments' => array('administer content types'),
+   );
+  $items['my-appointments'] = array(
+    'title' => 'Login Third Party site',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('saml_login_form'),
+    'type' => MENU_NORMAL_ITEM,
+    'access arguments' => array('access content'),
+  );
+  $items['smart-office'] = array(
+    'title' => 'SmartOffice information for user',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('smart_office_info_form'),
+    'type' => MENU_NORMAL_ITEM,
+    'access arguments' => array('access content'),
+  );
+
+  return $items;
+}
+function remove_third_party_info_form($form_state,$form_id,$arg3, $arg4){
+  $destination = 'admin/config/third-party-link/'.$arg3;
+  $form['uid'] = array(
+     '#type' => 'hidden', 
+     '#default_value' => $arg4
+   );
+  $form['arg3'] = array(
+     '#type' => 'hidden', 
+     '#default_value' => $arg3
+   );
+   $form['notes'] = array(
+     '#type' => 'markup',
+     '#markup' => 'Are you sure you want to remove ?',
+   );
+   $form['delete'] = array(
+     '#type' => 'submit', 
+     '#value' => t('Remove'),
+   );
+   $form['cancel'] = array(
+     '#markup' => l(t('Cancel'), $destination),
+   );
+  return $form;
+}
+function remove_third_party_info_form_submit($form_id,$form_state){
+  $destination = 'admin/config/third-party-link/'.$form_state['values']['arg3'];
+  $uid = $form_state['values']['uid'];
+  $existing = user_load($uid);
+    $edit = (array) $existing;
+    if($form_state['values']['arg3']==='surance-bay'){
+       $edit['field_surancebay_email']['und'][0]['value'] = '';
+       $edit['field_surancebay_paasword']['und'][0]['value'] = '';
+       $edit['field_surancebay_gaidvalue']['und'][0]['value'] = '';
+       unset($edit['pass']);
+       user_save($existing, $edit);
+    }else if($form_state['values']['arg3']==='smart-office'){
+      $edit['field_smartoffice_user']['und'][0]['value'] = '';
+      $edit['field_smartoffice_password']['und'][0]['value'] = '';
+      $edit['field_smartoffice_office']['und'][0]['value'] = '';
+      unset($edit['pass']);
+      user_save($existing, $edit);
+    }else
+       drupal_set_message("Something went wrong please try after sometime!","error");
+  drupal_set_message("User information removed!");
+  drupal_goto($destination);
+}
+
+
+function _add_surance_bay_info(){
+   $headers = array(
+     array('data' => t('uid')),
+     array('data' => t('Name')),
+     array('data' => t('Email')),
+     array('data' => t('Action')),
+   );
+
+   $rows  = array();
+   $query = db_query("SELECT * FROM users WHERE uid != :id", array(':id' => 0));
+   while ($row = $query->fetchObject()) { 
+    $user_data = user_load($row->uid);
+     if($user_data->field_surancebay_gaidvalue['und'][0]['value']!=null)
+     $rows[] = array($row->uid,$row->name,$row->mail,l('Remove','admin/config/third-party-link/surance-bay/'.$row->uid.'/delete'));
+  }
+  $table = theme_table(
+     array(
+       "header" => $headers,
+        "rows" => $rows,
+        "attributes" => array(),
+        "sticky" => true, // Table header will be sticky
+        "caption" => "List of user having information of SuranceBay.",
+        "colgroups" => array(),
+        "empty" => t("No information of SuranceBay found for any user")
+      )).theme("pager");
+   $output = drupal_render(drupal_get_form('surance_bay_admin_form')).$table;
+   return $output;
+}
+
+function _add_smart_office_info(){
+  $headers = array(
+     array('data' => t('uid')),
+     array('data' => t('Name')),
+     array('data' => t('Email')),
+     array('data' => t('Action')),
+   );
+   $rows  = array();
+   $query = db_query("SELECT * FROM users WHERE uid != :id", array(':id' => 0));
+   while ($row = $query->fetchObject()) { 
+     $user_data = user_load($row->uid);
+     if($user_data->field_smartoffice_office['und'][0]['value']!=null)
+     $rows[] = array($row->uid,$row->name,$row->mail,l('Remove','admin/config/third-party-link/smart-office/'.$row->uid.'/delete'));
+   }
+   $table = theme_table(
+     array(
+       "header" => $headers,
+        "rows" => $rows,
+        "attributes" => array(),
+        "sticky" => true, // Table header will be sticky
+        "caption" => "List of user having information of SmartOffice.",
+        "colgroups" => array(),
+        "empty" => t("No information of SmartOffice found for any user")
+      )).theme("pager");
+   $output = drupal_render(drupal_get_form('smart_office_admin_form')).$table;
+   return $output;
+}
+
+/**
+ * Implementation of  hook_form().
+ **/
+function smart_office_info_form($form, &$form_state) {
+  global $user;
+  $user_data = user_load($user->uid);
+  $form = array();
+  $form_url ='https://mysmartoffice2.ez-data.com/cdsApp?Module=Login&soLogin=1&trustedWindow=1&_pageno=3';
+  $form['#action'] = url($form_url);
+  $form['#method'] = 'post';
+  $form['#attributes']['target'] = '_smartoffice';
+
+   $form['Office'] = array(
+     '#type' => 'hidden',
+     '#title' => t('Office'),
+     '#default_value' => $user_data->field_smartoffice_office['und'][0]['value'],//'AdvisorsChoiceInsSvc',
+   ); 
+
+   $form['User'] = array(
+     '#type' => 'hidden',
+     '#title' => t('User'),
+     '#default_value' => $user_data->field_smartoffice_user['und'][0]['value'],//'Dberlinger',
+   ); 
+
+   $form['Pwd'] = array(
+     '#type' => 'hidden',
+     '#title' => t('Password'),
+     '#default_value' => $user_data->field_smartoffice_password['und'][0]['value'],//'Password01',
+   ); 
+   $form['returnURL'] = array(
+     '#type' => 'hidden',
+     '#title' => t('returnURL'),
+     '#default_value' => 'http://myadvisorschoice.biz/',
+   );
+   return $form;
+}
+
+/**
+ * listing all available users().
+ **/
+function listAllUsers(){
+
+  $users = entity_load('user');
+  $userFound = array();
+  foreach ($users as $user => $value) {
+  	if($value->uid>1)
+    $userFound[$value->uid] = $value->name;
+  }
+  return $userFound;
+}
+/**
+ * Implementation of  hook_form().
+ **/
+
+function saml_login_form($form, &$form_state) {
+   $form = array();
+   $form['#action'] = url('https://surelc.surancebay.com/sbweb/login.jsp');
+   $form['#method'] = 'post';
+   $form['#attributes']['target'] = '_res';
+   global $user;
+   $user_data = user_load($user->uid);
+
+   $form['gaIdValue'] = array(
+     '#type' => 'hidden',
+     '#title' => t('gaIdValue'),
+     '#default_value' => ($user_data->field_surancebay_gaidvalue['und'][0]['value']!=null)?$user_data->field_surancebay_gaidvalue['und'][0]['value']:0,
+   ); 
+  
+   $form['emailValue'] = array(
+     '#type' => 'hidden',
+     '#title' => t('emailValue'),
+     '#default_value' => $user_data->field_surancebay_email['und'][0]['value'],//$user->mail,
+   );
+
+   $form['passwordValue'] = array(
+     '#type' => 'hidden',
+     '#title' => t('passwordValue'),
+     '#default_value' => $user_data->field_surancebay_paasword['und'][0]['value'],//$user->pass,
+   );
+   return $form;
+}
+/**
+ *  Hidding SmartOffice and SuranceBay fields from user profile page.
+ **/
+function samllogin_form_alter(&$form, $form_state, $form_id) {
+    if ($form_id === 'user_profile_form') {
+        $form['field_smartoffice_office']['#access'] = FALSE;
+        $form['field_smartoffice_user']['#access'] = FALSE;
+        $form['field_smartoffice_password']['#access'] = FALSE;
+
+        $form['field_surancebay_email']['#access'] = FALSE;
+        $form['field_surancebay_paasword']['#access'] = FALSE;
+        $form['field_surancebay_gaidvalue']['#access'] = FALSE;
+    }
+}

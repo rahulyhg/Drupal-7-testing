@@ -1,0 +1,25 @@
+<?php
+function drupalchamp_uc_cart_block_content($variables) {
+  $help_text = $variables['help_text'];
+  $items = $variables['items'];
+  $item_count = $variables['item_count'];
+  $item_text = $variables['item_text'];
+  $total = $variables['total'];
+  $summary_links = $variables['summary_links'];
+  $collapsed = $variables['collapsed'];
+
+  $output = '';
+ //displaying block content with cart icon and item count only.
+ if($item_count){
+ $output .= '<a href="cart">';
+ $output .= '<span class="cart-block-icon-full" title="view your shopping cart"></span>';
+ $output .= '<span class="cart-block-title-bar">'.$item_count.' item</span>';
+ $output .='</a>';
+}else{
+ $output .= '<a href="cart">';
+ $output .= '<span class="cart-block-icon-empty" title="view your shopping cart"></span>';
+ $output .= '<span class="cart-block-title-bar">My cart</span>';
+ $output .='</a>';
+}
+  return $output;
+}

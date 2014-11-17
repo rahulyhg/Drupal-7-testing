@@ -1,0 +1,28 @@
+<?php
+/*
+ * Implements hook_block_info()
+ *
+*/
+function deckfifty_block_info() {
+  $blocks['twitter_pull'] = array(
+    'info' => t('Twitter Pull'),
+  );
+ 
+  return $blocks;
+}
+/*
+ * Implements hook_block_view()
+ *
+*/
+function deckfifty_block_view($delta) {
+  $block = array();
+ 
+  switch ($delta) {
+    case 'twitter_pull':
+      $block['subject'] = t('Twitter Feed');
+      $block['content'] = twitter_pull_render('@deckfifty', '', 3); // swap out @deckfifty with your twitter handle, and 3 with the number of posts you want to display
+      break;
+  }
+ 
+  return $block;
+}
