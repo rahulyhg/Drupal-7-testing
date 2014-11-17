@@ -1,0 +1,254 @@
+<?php
+/**
+ * @file
+ *
+ * Integration of lm_paypal into features module.
+ */
+
+/**
+ * Implements hook_features_api().
+ * Create entity(components) for export by features.
+ */
+function lm_paypal_features_features_api() {
+  $info = array();
+
+  $key = 'lm_paypal_features_settings';
+  $info[$key] = array(
+    'name' => t('Lm paypal settings'),
+    'feature_source' => TRUE,
+    'default_hook' => 'default_' . $key,
+    'default_file' => FEATURES_DEFAULTS_INCLUDED,
+  );
+
+  $key = 'lm_paypal_features_subscriptions';
+  $info[$key] = array(
+    'name' => t('Lm paypal subscriptions'),
+    'feature_source' => TRUE,
+    'default_hook' => 'default_' . $key,
+    'default_file' => FEATURES_DEFAULTS_INCLUDED,
+  );
+
+  return $info;
+}
+
+/**
+ * Implements hook_features_export().
+ *
+ */
+function lm_paypal_features_settings_features_export($data, &$export, $module_name = '') {
+  $pipe = array();
+  $export['dependencies']['lm_paypal'] = 'lm_paypal';
+  $export['dependencies']['ctools'] = 'ctools';
+
+  $component = 'lm_paypal_features_settings';
+  foreach ($data as $object_name) {
+    $export['features'][$component][$object_name] = $object_name;
+  }
+
+  return $pipe;
+}
+
+/**
+ * Implements hook_features_export_options().
+ * Make system variables' array of component 'lm_paypal_features_settings' for export.
+ *
+ */
+function lm_paypal_features_settings_features_export_options() {
+  $options = array();
+
+  $options['lm_paypal_host'] = 'LM PayPal Host';
+  $options['lm_paypal_business'] = 'LM PayPal Business/Premier Email';
+  $options['lm_paypal_ipns_max_age'] = 'LM PayPal Max Age IPNS';
+  $options['lm_paypal_debug'] = 'LM PayPal Debug';
+  $options['lm_paypal_obey_test_ipns'] = 'LM PayPal Obey Test IPNS';
+
+  return $options;
+}
+
+/**
+ * Implements hook_schema_alter().
+ * Make the system variables table usable by export.inc of ctools.
+ */
+function lm_paypal_features_schema_alter(&$schema) {
+  if (empty($schema['variable'])) {
+    return;
+  }
+  $schema['variable']['export'] = array(
+    'key' => 'name',
+    'identifier' => 'lm_paypal_features_settings',
+    'default hook' => 'default_lm_paypal_features_settings',
+    'api' => array(
+      'owner' => 'lm_paypal_features_settings',
+      'api' => 'lm_paypal_features_settings',
+      'minimum_version' => 1,
+      'current_version' => 1,
+    ),
+  );
+  $schema['variable']['fields']['value']['serialize'] = TRUE;
+}
+
+/**
+ * Implements hook_features_export_render().
+ * Make variables' array export
+ */
+function lm_paypal_features_settings_features_export_render($module_name = '', $data, $export = NULL) {
+  ctools_include('export');
+  $str_code = '  $export = array();' . "\n\n";
+  $variables = db_select('variable', 'v')
+    ->fields('v', array('name', 'value'))
+    ->condition('name', $data, 'IN')
+    ->orderBy('name')
+    ->execute();
+  $schema = ctools_export_get_schema('variable');
+  $ident = $schema['export']['identifier'];
+  foreach ($variables as $object) {
+    $object = _ctools_export_unpack_object($schema, $object);
+    $str_code .= _ctools_features_export_crud_export('variable', $object, '  ');
+    $str_code .= "  \$export[" . ctools_var_export($object->name) . "] = \${$ident};\n\n";
+  }
+  $str_code .= '  return $export;';
+
+  return array($schema['export']['default hook'] => $str_code);
+}
+
+/**
+ * Implements hook_features_revert().
+ * Makes change data
+ */
+function lm_paypal_features_settings_features_revert($module) {
+  //Get defaults
+  $defaults_vars = features_get_default('lm_paypal_features_settings', $module);
+  if (empty($defaults_vars)) {
+    return;
+  }
+  //Load lm-paypals' variables.
+  $vars = lm_paypal_features_vars_load();
+  if (empty($vars)) {
+    return;
+  }
+  foreach ($defaults_vars as $name => $default_var) {
+    //Compare defaults and variables in DB
+    if ($default_var->value !== $vars[$name]->value) {
+      variable_set($name, $default_var->value);
+    }
+  }
+}
+
+/**
+ * Load lm-paypals' variables.
+ */
+function lm_paypal_features_vars_load() {
+  ctools_include('export');
+  static $vars;
+  ctools_export_load_object_reset('variable');
+  if (!isset($vars)) {
+    $vars = ctools_export_crud_load_multiple('variable', lm_paypal_features_get_lm_paypal_name_variables());
+  }
+  return $vars;
+}
+
+/**
+ * @return array of lm_paypals' name variables
+ */
+function lm_paypal_features_get_lm_paypal_name_variables() {
+  return array(
+    'lm_paypal_business',
+    'lm_paypal_debug',
+    'lm_paypal_host',
+    'lm_paypal_ipns_max_age',
+    'lm_paypal_obey_test_ipns',
+    'lm_paypal_skip_validation'
+  );
+}
+
+/**
+ * Make enable import module
+ *
+ * */
+function lm_paypal_features_settings_features_enable_feature($module) {
+  lm_paypal_features_settings_features_revert($module);
+}
+
+/**
+ * Implements hook_features_export().
+ */
+function lm_paypal_features_subscriptions_features_export($data, &$export, $module_name = '') {
+  $pipe = array();
+  $export['dependencies']['lm_paypal'] = 'lm_paypal';
+
+  $component = 'lm_paypal_features_subscriptions';
+  foreach ($data as $object_name) {
+    $export['features'][$component][$object_name] = $object_name;
+  }
+  return $pipe;
+}
+
+/**
+ * Implements hook_features_export_options().
+ * Output subscriptions' names in interface
+ */
+function lm_paypal_features_subscriptions_features_export_options() {
+  $table = 'lm_paypal_subscriptions';
+  $options = array();
+
+  $query = "SELECT * FROM {{$table}}";
+  $fields = db_query($query);
+  while ($row = $fields->fetchObject()) {
+    $options[$row->subid] = 'Subscription: ' . $row->item_name;
+  }
+  return $options;
+}
+
+/**
+ * Implements hook_features_export_render()
+ * Make variables' array export
+ */
+function lm_paypal_features_subscriptions_features_export_render($module_name = '', $data, $export = NULL) {
+  $items = array();
+  $subscriptions = db_select('lm_paypal_subscriptions', 'lmpsub')
+    ->fields('lmpsub')
+    ->condition('subid', $data, 'IN')
+    ->execute();
+  foreach ($subscriptions as $subscription) {
+    $items[$subscription->subid] = $subscription;
+  }
+  $str_code = "  \$items = " . features_var_export($items, '  ') . ";\n";
+  $str_code .= '  return $items;';
+
+  return array('default_lm_paypal_features_subscriptions' => $str_code);
+}
+
+/**
+ * Implements hook_features_revert()
+ */
+function lm_paypal_features_subscriptions_features_revert($module) {
+  //Get defaults
+  $defaults_subs = features_get_default('lm_paypal_features_subscriptions', $module);
+  if (empty($defaults_subs)) {
+    return;
+  }
+  //Save subscriptions
+  foreach ($defaults_subs as $default_sub) {
+    _lm_paypal_features_subscriptions_save($default_sub);
+  }
+}
+
+/**
+ * Save subscriptions into DB
+ * @param $object
+ */
+function _lm_paypal_features_subscriptions_save($subscription) {
+  if (!$subscription) {
+    return;
+  }
+  $subscription = (object) $subscription;
+  $subscription->subid = NULL;
+  drupal_write_record('lm_paypal_subscriptions', $subscription);
+}
+
+/**
+ * Make enable import module
+ */
+function lm_paypal_features_subscriptions_features_enable_feature($module) {
+  lm_paypal_features_subscriptions_features_revert($module);
+}

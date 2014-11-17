@@ -1,0 +1,83 @@
+
+6.x-2.x-dev - Status at 2011-05-11
+==================================
+* Set the cancel url to the 'cancel_return' field, not the 'return' field. [#872456].
+
+6.x-2.x-dev - Status at 2009-02-18
+==================================
+
+* Did *A LOT* of cleaning in subscriptions module.
+* Fixed some wrong tests in paid_adverts module.
+* Still working on general cleaning (subscriptions and base module).
+* Make use of job_queue module for mail sending, if present.
+* Wrote some hook_requirements().
+
+Any changes will be for 2009-02-19 because drupal.org is currently offline for
+schedule maintenance (and comit won't work).
+
+6.x-2.x-dev - Status at 2009-02-17
+==================================
+
+* Current status (below is changelog):
+    - We need to finish lm_paypal module properly. This includes providing full
+      paypal usage API, custom and general paypal form generation, provide full
+      configuration, clean older methods, and split module with theme functions
+      and better Drupal hooks usage.
+    - Subscriptions handling module is really ugly, old, and still full of bugs,
+      we need to (eventually fully) rewrite it.
+    - Paid adverts module is OK, but hook_nodeapi() is still ugly.
+    - Donation should just work, but needs review.
+
+* Outdated file. Changelog must be made with CVS changelog review.
+  Too much old code has been moved/removed/clean/rewriten.
+
+* Test files have been renamed. Sorry lyrincs, I just can't stand too long
+  names. And a lot of other modules just do it also, so why not.
+
+* Some modules test files have been splitted in many test classes. It more
+  revealant, we can just process unit-testing for a single part for debug, in
+  case only this only one fails.
+
+* Partial rewrite of lm_paypal_subscriptions module
+    - Full usage of new process ipn hooks provided by lm_paypal
+    - Module file splited in admin.inc, pages.inc, .theme files
+    - Rewrote all hook_menu() part, make high usage of access callbacks
+    - Some code cleanup
+  Important notes: module is still really unstable, do not, never use any
+  non unit-tested function from that module until stable releases.
+
+* Almost full rewrite of lm_paypal_paid_adverts module
+    - Now use in a cleaner way hook_nodeapi() and hook_link()
+    - Provide some simple API functions for other modules
+    - Did some static cache to improve performances
+    - Did some ergonomic tricks that look and feel really nicier
+    - Make high usage of hook_menu() and access callbacks
+    - Really high unit-test coverage
+  Code is still ugly. Rewriting body and title in content in nodeapi is
+  something which is really ugly, and that can't override any other module
+  behavior.
+  New way of hiding content is still in brain storming.
+
+* lm_paypal_donation don't seems to past tests anymore. Module needs review.
+
+* lm_paypal low level module has been highly rewriten, and now provide a nicier
+  API and some (sadly undocumented) usable hooks to use paypal.
+
+6.x-2.x-dev - Status before 2009
+================================
+
+* WIP add simpletest for LM Paypal
+
+* split lm_paypal.module into admin and ipn include files to reduce the amount
+  of code being loaded on every page request.
+
+* update IPN table definition to match format coming from the IPN simulator
+
+* WIP change admin settings to tabs, rather than nested menus
+
+* remove lots of dynamic SQL generation in favor of drupal_write_record()
+
+* remove custom HTTP code in favor of drupal_http_request()
+
+* WIP remove grotty packing of UID into 16 bits in IPN->custom
+

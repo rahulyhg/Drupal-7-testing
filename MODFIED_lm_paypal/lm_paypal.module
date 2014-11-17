@@ -1,0 +1,994 @@
+<?php
+
+/**
+ * @file
+ *
+ * PayPal interface.
+ */
+
+define('LM_PAYPAL', 'LM_PayPal');
+
+// Don't change these here! Use the admin interface at admin/config/lm_paypal
+define('LM_PAYPAL_HOST_DEFAULT', 'www.paypal.com');
+define('LM_PAYPAL_OBEY_TEST_IPNS_DEFAULT', 0);
+define('LM_PAYPAL_IPNS_MAX_AGE_DEFAULT', 120); // Max hours to keep IPNS
+
+define('LM_PAYPAL_CURRENCY_DEFAULT', 'EUR');
+
+// Never change these unless you really know what you are doing?
+define('LM_PAYPAL_DEBUG_DEFAULT', FALSE);
+define('LM_PAYPAL_VALIDATE_TIMEOUT', 30);
+
+// Paypal form: handle 'cmd' setting for paypal
+define('LM_PAYPAL_FORM_CMD_BUY_NOW',   1);
+define('LM_PAYPAL_FORM_CMD_DONATE',    2);
+define('LM_PAYPAL_FORM_CMD_SUBSCRIBE', 3);
+
+/**
+ * Implements of hook_permission().
+ */
+function lm_paypal_permission() {
+  return array(
+    'administer lm_paypal' => array(
+      'title' => 'Administer LM PayPal',
+      'description' => 'View and modify LM PayPal Settings and payments.'
+    )
+  );
+}
+
+/**
+ * Implements of hook_menu().
+ */
+function lm_paypal_menu() {
+  $items = array();
+
+  // Each of the LM Paypal modules has a tab under admin/config/lm_paypal.
+  // Their "main settings page" should be the default, and any other
+  // view/configure pages should be second-level tabs.
+  
+
+
+  $items['admin/config/lm_paypal'] = array(
+    'title' => 'LM PayPal',
+    'description' => 'LM PayPal',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  );
+  $items['admin/config/lm_paypal/settings'] = array(
+    'file' => 'lm_paypal.admin.inc',
+    'title' => 'LM PayPal Settings',
+    'description' => 'LM PayPal is a set of modules that interface to paypal.com',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('lm_paypal_settings_form'),
+    'access arguments' => array('administer lm_paypal'),
+  );
+
+  // Tab 1.2: LM Paypal Settings
+  $items['admin/config/lm_paypal/ipns'] = array(
+    'file' => 'lm_paypal.admin.inc',
+    'title' => 'Saved IPNs',
+    'description' => 'Show details of all saved PayPal IPN\'s',
+    'page callback' => 'lm_paypal_ipns',
+    'access arguments' => array('administer lm_paypal'),
+    'weight' => 2,
+  );
+
+  // Default return path for
+  $items['lm_paypal/thanks'] = array(
+    'title' => 'Proceeding payment',
+    'description' => 'Default return path for paypal payment form'
+      . 'This happens only when a custom module does not specify its own.',
+    'page callback' => 'lm_paypal_page_thanks',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  // Display the details of a saved IPN - internal
+  $items['admin/config/lm_paypal/id'] = array(
+    'file' => 'lm_paypal.admin.inc',
+    'title' => 'Show ID Details',
+    'type' => MENU_CALLBACK,
+    'page callback' => 'lm_paypal_id',
+    'access arguments' => array('administer lm_paypal'),
+    'description' => 'Show details of a single saved IPN',
+  );
+
+  // URL for PayPal to send IPN (incoming payment notifications) to.
+  $items['lm_paypal/ipn'] = array(
+    'file' => 'lm_paypal.ipn.inc',
+    'title' => 'LM PayPal Incoming IPN',
+    'type' => MENU_CALLBACK,
+    'page callback' => 'lm_paypal_ipn_in',
+    'access callback' => TRUE,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements of hook_theme().
+ */
+function lm_paypal_theme() {
+  return array(
+    'lm_paypal_payment_form' => array(
+      'arguments' => array('form' => array()),
+      'file' => 'lm_paypal.theme',
+    ),
+    'lm_paypal_amount' => array(
+      'arguments' => array($options = array()),
+      'file' => 'lm_paypal.theme',
+    ),
+  );
+}
+
+/**
+ * Implements of hook_cron().
+ */
+function lm_paypal_cron() {
+  _lm_paypal_clean_stored_ipns();
+}
+
+/**
+ * Implements of hook_requirements().
+ */
+function lm_paypal_requirements($phase) {
+  $requirements = array();
+  $t = get_t();
+
+  if ($phase == 'runtime') {
+    if (! lm_paypal_api_get_business()) {
+      $requirements['lm_paypal'] = array(
+        'title' => t('LM PayPal'),
+        'severity' => REQUIREMENT_ERROR,
+        'value' => $t('LM PayPal default business address is not configured. Please set it in <a href="!admin_page">administration page</a>', array(
+          '!admin_page' => url('admin/config/lm_paypal/settings'),
+        )),
+      );
+    }
+  }
+
+  return $requirements;
+}
+
+/**
+ * Tells if module is in debug mode.
+ * 
+ * @return boolean
+ *   TRUE if lm_paypal is in debug mode
+ */
+function lm_paypal_debug() {
+  return (bool) variable_get('lm_paypal_debug', LM_PAYPAL_DEBUG_DEFAULT);
+}
+
+/**
+ * Get the configured paypal host.
+ * 
+ * @param boolean $url = FALSE
+ *   If set to TRUE, return the webscr full absolute URL
+ * @return string
+ *   Paypal hostname
+ */
+function lm_paypal_api_get_host($full_url = FALSE) {
+  $hostname = variable_get('lm_paypal_host', LM_PAYPAL_HOST_DEFAULT);
+  if ($full_url) {
+    return 'https://' . $hostname . '/cgi-bin/webscr';
+  }
+  return $hostname;
+}
+
+/**
+ * Return the notify url. Every module that uses this one's API but a custom
+ * payement form should use this method.
+ * 
+ * @return string
+ *   Notify url for paypal
+ */
+function lm_paypal_api_get_notify_url() {
+  return url('lm_paypal/ipn', array('absolute' => TRUE));
+}
+
+/**
+ * Get the configured paypal business.
+ * 
+ * @return string
+ *   Paypal business name
+ */
+function lm_paypal_api_get_business() {
+  return variable_get('lm_paypal_business', '');
+}
+
+/**
+ * TODO: use currency module if they have it? http://drupal.org/project/currency
+ * Get currency localized textual description or symbol.
+ * 
+ * If you don't specify a currency code you want, this function will return an
+ * array containing all the lm_paypal supported currencies descriptions.
+ * 
+ * @param string $currency = NULL
+ *   (optional) If set, the function will return only the given currency code
+ *   data.
+ * @param boolean $syms = FALSE
+ *   (optional) If set to TRUE, return the given currency symbol instead of the
+ *   currency localized textual description.
+ * @return mixed
+ *   Data (string) about one currency or array of all support currencies
+ *   NULL if $currency is unknown.
+ */
+function lm_paypal_api_get_currency($currency = NULL, $syms = FALSE) {
+  static $currencies_text, $currencies_syms;
+  // TODO:plurals
+  if (! $syms && ! $currencies_text) {
+    $currencies_text = array(
+      // '' => t('default currency'),  Force a currency to be specified
+      'USD' => t('U.S. Dollar'),
+      'GBP' => t('Pound Sterling'),
+      'EUR' => t('Euro'),
+      'AUD' => t('Australian Dollar'),
+      'CAD' => t('Canadian Dollar'),
+      'JPY' => t('Japanese Yen'),
+      'CHF' => t('Swiss Franc'),
+      'CZK' => t('Czech Koruna'),
+      'DKK' => t('Danish Krone'),
+      'HKD' => t('Hong Kong Dollar'),
+      'HUF' => t('Hungarian Forint'),
+      'NOK' => t('Norwegian Krone'),
+      'NZD' => t('New Zealand Dollar'),
+      'PLN' => t('Polish Zloty'),
+      'SEK' => t('Swedish Krona'),
+      'SGD' => t('Singapore Dollar'),
+    );
+  }
+  if ($syms && ! $currencies_syms) {
+    $currencies_syms = array(
+      '' => '?',
+      'AUD' => 'AUD$',
+      'CAD' => 'Can$',
+      //'EUR' => '&euro;',  This causes problems depending on the fonts
+      // available and the version of the browser used
+      // TODO: pounard: I think we should write the real Euro sign (€)
+      'EUR' => 'Euro',
+      'GBP' => '&#163;',
+      'JPY' => '&#165;',
+      'USD' => '$',
+      'CHF' => 'CHF',   // Yes - it really is writen as CHF
+      'CZK' => 'Kc',
+      'DKK' => 'kr',
+      'HKD' => 'HK$',
+      'HUF' => 'Ft',
+      'NOK' => 'kr',
+      'NZD' => 'NZ$',
+      'PLN' => 'zl',  // I cannot find the HTML character for a crossed l
+      'SEK' => 'kr',
+      'SGD' => 'S$',
+    );
+  }
+
+  if ($currency) {
+    return $syms ? $currencies_syms[$currency] : $currencies_text[$currency];
+  }
+  elseif (! $currency) {
+    return $syms ? $currencies_syms : $currencies_text;
+  }
+}
+
+/**
+ * Get default configured currency code.
+ * 
+ * @return string
+ *   3 letter paypal currency identifier
+ */
+function lm_paypal_api_get_currency_default() {
+  return variable_get('lm_paypal_currency_default', LM_PAYPAL_CURRENCY_DEFAULT);
+}
+
+// TODO: pounard: This method should be owned by subscription module, right?
+function lm_paypal_api_get_period_unit_list($default = FALSE) {
+  static $cache;
+  if (! $cache) {
+    $cache = array(
+      'D' => t('Days'),
+      'W' => t('Weeks'),
+      'M' => t('Months'),
+      'Y' => t('Years'),
+    );
+  }
+  if ($default) {
+    return array(NULL, t('Default')) + $default;
+  }
+  else {
+    return $cache;
+  }
+}
+
+function _lm_paypal_clean_stored_ipns() {
+  $ipns_max_age = (int) variable_get('lm_paypal_ipns_max_age', LM_PAYPAL_IPNS_MAX_AGE_DEFAULT);
+  // Do not launch this action if no max age is specified (keep for ever).
+  if ($ipns_max_age > 0) {
+    if (lm_paypal_debug()) {
+      watchdog(LM_PAYPAL, 'cron');
+    }
+    $max_age = time() - ($ipns_max_age * 3600);
+    $num_deleted = db_delete('lm_paypal_ipns')
+                      ->condition('timestamp', $max_age , '<')
+                      ->execute();
+  }
+}
+
+/**
+ * Default return_path for paypal.
+ * 
+ * @return string
+ *   (x)html output
+ */
+function lm_paypal_page_thanks() {
+  return t('Thanks for your payment.');
+}
+
+/**
+ * Default payment form. Highly customisable.
+ * 
+ * This form display the item_name, the price/currency and a paypal submit
+ * button.
+ * It should fit for most cases. Either your form does not fit here or not,
+ * then think about get this form and alter it. Since it does not have any
+ * validate or submit function (action is the real paypal host), you don't
+ * have to care if you override it.
+ * 
+ * Note that, at least one parameter is mandatory: the amount. You may get
+ * back the form and change it to a input box, but without validation this
+ * is dangerous, your users should go through a business validation process
+ * before getting to this form.
+ *
+ * @param $form_state
+ *   Form API stuff.
+ *
+ * @param mixed $amount
+ *   You can pass either a float value that will be passed in an hidden field
+ *   either an array of integers values, which will display a select.
+ *   TODO: re-add support for a textfield with pre-populated value
+ *
+ * @param array $options = array()
+ *   (optional) Pairs of setting => custom value where setting can be:
+ *
+ *     'item_name': integer
+ *        Textual human-readable representation of item.
+ *        Default is localized string 'Donation' (ok, 'Unknown' is not a very
+ *        sexy item name to display to user).
+ *
+ *     'item_number': integer
+ *        Item number (depends on your business code)
+ *        Default is 0.
+ *
+ *     'currency_code': string
+ *        Paypal 3 letters currency code, see lm_paypal_api_get_currency().
+ *        Default is default configured currency in lm_paypal main module.
+ *
+ *     'custom': array
+ *        Keyed array of data you might want to pass through PayPal processing
+ *        and get back later when processing the incoming IPN
+ *
+ *     'return_path': string
+ *        May be this one is the only one interesting for you, you should pass
+ *        a drupal path where you want to redirect your user after he procedeed
+ *        his payment.
+ *        Default is a page displaying the thanks message from lm_paypal main
+ *        module.
+ *        Note that if the path is not valid, then lm_paypal default will be
+ *        used.
+ * 
+ *     'cancel_path': string
+ *        Internal path in case of cancel. If not specified, it will use
+ *        return_path setting.
+ *
+ *     'text': string
+ *        (x)html text to display over the form (eg: 'Validate your command').
+ *        Don't forget to check_plain() your text!
+ *        Default is no text displayed.
+ *
+ *     'button': array
+ *        'text': string
+ *            Whatever you want to display on submit button.
+ *
+ *        'url': string
+ *          In case you want to display a image from an external (or internal)
+ *          website, use this opton to put the url.
+ *          Note that if you specify this, button_text will be used as alternative
+ *          text for the image.
+ *
+ *     'amount_label': string
+ *        Changes the label for the select textfield/selectfield
+ *
+ *     'display_amount': boolean
+ *        Set this to FALSE if you dont want the price to be displayed (or if
+ *        you want to display it yourself in the 'text' setting).
+ *        Default is amount is displayed.
+ *        Note that if you gave an array of amounts, it will remain FALSE,
+ *        whatever you pass to this option.
+ *
+ *     'hidden': array
+ *        Keyed array of values you want to pass as hidden values through paypal
+ *        form.
+ *        Advanced usage only!
+ *
+ *   @param string $type: int
+ *      One of the LM_PAYPAL_FORM_CMD_* constants, this changes the 'cmd' form
+ *      setting sent to paypal.
+ *      Default is LM_PAYPAL_FORM_CMD_BUY_NOW
+ *
+ *     More to come, module in active development.
+ *
+ * @return array
+ *   Drupal well formated form you can then build with drupal's form API.
+ *   Or FALSE if amount is not a valid positive float.
+ */
+function lm_paypal_api_payment_form($form, $form_state, $amount, $options = array(), $type = LM_PAYPAL_FORM_CMD_BUY_NOW) {
+
+  // Check for the different forms of $amount allowed: either a value, or an
+  // array of values (with the default value being [value] rather than value.
+
+  $valid_amount   = NULL;
+  $default_amount = FALSE;
+
+  // Check amount is valid
+  if (is_array($amount) && ! empty($amount)) {
+    $valid_amount = array();
+
+    foreach ($amount as $key => $value) {
+      if (is_array($value)) {
+        $default_amount = $value = current($value);
+      }
+
+      // Always prefer casts to *_val() php functions.
+      if (( (float) $value) > 0) {
+        $valid_amount["$value"] = $value;
+      }
+    }
+
+    $amount_is_valid = ! empty($amount);
+  }
+  else {
+    $valid_amount = (float) $amount;
+  }
+
+  if (empty($valid_amount)) {
+    return array();
+  }
+  elseif (is_array($valid_amount)) {
+    $options['display_amount'] = FALSE;
+  }
+
+  global $user;
+  // Check our user can access to return path
+  if (isset($options['return_path']) && drupal_valid_path($options['return_path'])) {
+    $return_url = url($options['return_path'], array('absolute' => TRUE));
+  }
+  else {
+    $return_url = url($_GET['q'], array('query' => NULL, 'fragment' => NULL, 'absolute' => TRUE));
+  }
+  // And cancel path if set
+  if (isset($options['cancel_path']) && drupal_valid_path($options['cancel_path'])) {
+    $cancel_url = url($options['cancel_path'], array('absolute' => TRUE));
+  }
+  else {
+    $cancel_url = $return_url;
+  }
+
+  // Check for a specified currency
+  $currency_code = isset($options['currency_code']) ? $options['currency_code'] : lm_paypal_api_get_currency_default();
+
+  $button_text = t('Proceed to paypal.com');
+  
+  // And check for button customization
+  if (isset($options['button']) && is_array($options['button'])) {
+    if (isset($options['button']['url']) && check_url($options['url'])) {
+      $button_url = $options['url'];
+    }
+    if (isset($options['button']['text'])) {
+      $button_text = check_plain($options['button']['text']);
+    }
+  }
+
+  $form['#action'] = lm_paypal_api_get_host(TRUE);
+  $form['business'] = array(
+    '#type' => 'hidden',
+    '#name' => 'business',
+    '#value' => lm_paypal_api_get_business(),
+  );
+
+  // Check for paypal cmd type
+  switch ($type) {
+    case LM_PAYPAL_FORM_CMD_SUBSCRIBE:
+      $cmd = '_xclick-subscriptions';
+      break;
+
+    case LM_PAYPAL_FORM_CMD_DONATE:
+      $cmd = '_donations';
+      break;
+
+    case LM_PAYPAL_FORM_CMD_BUY_NOW:
+    default:
+      $cmd = '_xclick';
+      break;
+  }
+
+  $form['cmd'] = array(
+    '#type' => 'hidden',
+    '#value' => $cmd,
+    '#name' => 'cmd',
+  );
+
+  $form['item_name'] = array(
+    '#type' => 'hidden',
+    // We will let empty name pass, sub module developers should be aware.
+    '#value' => isset($options['item_name']) ? check_plain($options['item_name']) : t('Donation'),
+    '#name' => 'item_name',
+  );
+  $form['item_number'] = array(
+    '#type' => 'hidden',
+    '#value' => isset($options['item_number']) ? ((int) $options['item_number']) : 0,
+    '#name' => 'item_number',
+  );
+  $form['no_shipping'] = array(
+    '#type' => 'hidden',
+    '#value' => 1,
+    '#name' => 'no_shipping',
+  );
+  $form['return'] = array(
+    '#type' => 'hidden',
+    '#value' => $return_url,
+    '#name' => 'return',
+  );
+  $form['cancel_return'] = array(
+    '#type' => 'hidden',
+    '#value' => $cancel_url,
+    '#name' => 'cancel_return',
+  );
+  $form['currency_code'] = array(
+    '#type' => 'hidden',
+    '#value' => $currency_code,
+    '#name' => 'currency_code',
+  );
+  if (isset($options['text'])) {
+    $form['amount_text'] = array(
+      '#type' => 'markup',
+      '#markup' => $options['text'],
+    );
+  }
+  
+  // Either display the textfield or the select
+  if (is_array($valid_amount)) {
+    $textual_currency = lm_paypal_api_get_currency($currency_code, FALSE);
+    if (! $textual_currency) {
+      $textual_currency = $currency_code;
+    }
+    $label = t('Select an amount');
+    $form['amount'] = array(
+      '#type' => 'select',
+      '#options' => $valid_amount,
+      '#description' => t('Value is @currency', array('@currency' => $textual_currency)),
+    );
+    
+    if ($default_amount) {
+      $form['amount']['#default_value'] = $default_amount;
+    }
+
+    if (count($valid_amount) === 1) {
+      $label = t('Enter an amount');
+      $form['amount']['#type'] = 'textfield';
+      $form['amount']['#value'] = current($valid_amount);
+      $form['amount']['#size'] = '';
+      unset($form['amount']['#options']);
+    }
+    
+    //use label if set
+    if (isset($options['amount_label'])) {
+      $label = $options['amount_label'];
+    }
+    
+    $form['amount']['#title'] = t($label); 
+  }
+  else {
+    if (isset($options['display_amount']) && $options['display_amount']) {
+      $form['amount_display'] = array(
+        '#type' => 'markup',
+        '#markup' => '<p>' . t('Proceed with your !price payment', array(
+          '!price' => theme('lm_paypal_amount', array('amount' => $valid_amount, 'cc' => $currency_code)))) . '</p>',
+      );
+    }
+    $form['amount'] = array(
+      '#type' => 'hidden',
+      '#value' => $valid_amount,
+      '#name' => 'amount',
+    );
+  }
+  $form['notify_url'] = array(
+    '#type' => 'hidden',
+    '#value' => lm_paypal_api_get_notify_url(),
+    '#name' => 'notify_url',
+  );
+  if (empty($options['custom']) || !is_array($options['custom'])) {
+    $options['custom'] = array();
+  }
+  $options['custom']['uid'] = $user->uid;
+  $form['custom'] = array(
+    '#type' => 'hidden',
+    '#value' => serialize($options['custom']),
+    '#name' => 'custom',
+  );
+  
+  if (isset($options['hidden_fields']) && is_array($options['hidden_fields']) && ! empty($options['hidden_fields'])) {
+    foreach ($options['hidden_fields'] as $key => $value) {
+      // Do not override existing values
+      if (! isset($form[$key])) {
+        $form[$key] = array(
+          '#type' => 'hidden',
+          '#value' => check_plain($value),
+        );
+      }
+    }
+  }
+
+  if (isset($button_url) && $button_url) {
+    $form['submit'] = array(
+      '#type' => 'image_button',
+      '#value' => $button_text,
+      '#attributes' => array('src' => $button_url),
+      '#name' => 'submit',
+    );
+  }
+  else {
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => $button_text,
+      '#name' => 'submit',
+    );
+  }
+  return $form;
+}
+
+// =====================================================================
+// Below this line, module has not been "cleaned up"
+// TODO: pounard except the mail functions, it's almost fully "cleaned up".
+
+
+
+
+
+/**
+ * Implements of hook_help().
+ *
+ * TODO: must be fully rewritten
+ */
+/*
+ function lm_paypal_help($path, $arg) {
+
+  $admin = l('LM PayPal Admin', 'admin/config/lm_paypal');
+  $access = l('administer permissions', 'admin/people/permissions');
+
+  $help = l('LM PayPal Help', 'admin/help/lm_paypal');
+  $ipn = url('lm_paypal/ipn', array('query' => NULL, 'fragment' => NULL, 'absolute' => TRUE));
+
+  switch ($path) {
+    case 'admin/help#lm_paypal':
+      $output = $_lm_paypal_welcome;
+
+      $output .= '<p>'. t('If you are not already familar with PayPal please go to their <a href="http://www.paypal.com">website</a> and read up.') .'</p>';
+      $output .= '<p>'. t('If you are new to this module you need to:');
+      $output .= '<ul>';
+      $output .= '<li>'. t("Update the site specific settings via !admin. Normally you only need to provide your PayPal Business/Premier Email.", array("!admin" => $admin)) .'</li>';
+      $output .= '<li>'. t("On PayPal login to your Business/Premier account. Under <b>Profile</b> go to <b>Instant Payment Notification Preferences</b> and enable IPN.") .'</li>';
+      $output .= '<li>'. t("To have lm_paypal handle IPN messages that it did not generate, such as a Send Money originated from PayPal.com, also set the IPN URL to: <pre>!ipn</pre><br/>However it could be set to another url perhaps for ecommerce", array("!ipn" => $ipn)) .'</li>';
+      $output .= '<li>'. t('While on PayPal if you plan to handle multiple currencies then go to <b>Payment Receiving Preferences</b>. For the entry <b>Block payments sent to me in a currency I do not hold:</b> I suggest setting it either <b>Yes</b> (to block them) or <b>No, accept them and convert them to ...</b>. If set on <b>Ask Me</b> then each payment will have to be manually confirmed!') .'</li>';
+      $output .= '<li>'. t('Next configure one of the LM PayPal services such as subscriptions, donations or paid adverts') .'</li>';
+      $output .= '</ul>';
+      return $output;
+
+      // This is the brief description of the module displayed on the modules page
+    case 'admin/modules#description':
+      // New to Drupal 5 (because the page has moved)
+    case 'admin/config/modules#description':
+      return t("Lowest level PayPal interface required by other LM PayPal modules. Once enabled go to !admin and configure the site specific settings.", array("!admin" => $admin));
+
+      // Help at the start of admin/config/lm_paypal
+    case 'admin/config/lm_paypal':
+      $output = $_lm_paypal_welcome;
+
+      $output .= '<p>'. t("If you are looking to configure LM PayPal please follow the instructions !help.", array("!help" => $help)) .'</p>';
+      return $output;
+
+      //case 'admin/help#settings/lm_paypal': // causes a [more help] to appear
+      //case 'admin/help/settings/lm_paypal': // clicking [more help] gets this
+      // This appears at the start of the module settings page before the options
+    case 'admin/config/lm_paypal':
+      $output = $_lm_paypal_welcome;
+
+      $output .= '<p>'. t("If you have not done so already you will need to configure the LM PayPal modules and your PayPal business account.  Please follow the instructions !help.", array("!help" => $help)) .'</p>';
+      return $output;
+
+      // This appears at the start of the IPNs viewing page before the options
+    case 'admin/config/lm_paypal/ipns':
+      $output = $_lm_paypal_welcome;
+
+      $output .= '<p>'. t('These are the IPN messages received from PayPal.') .'</p>';
+      return $output;
+  }
+}
+*/
+
+
+
+
+
+/**
+ * Validates a formelement to ensure it is shaped like an email
+ *
+ * @param $formelement
+ *   The form element to be checked.
+ *
+ * If the element fails any of the tests form_set_error() is called.
+ */
+function lm_paypal_is_email_shaped($formelement) {
+  $biz = $formelement['#value'];
+  $fieldname = $formelement['#name'];
+  if (strpos($biz, '@') === FALSE) {
+    form_set_error($fieldname, t('Email address required.'));
+  }
+}
+
+/**
+ * Validates a formelement to ensure it is a number inside a given range.
+ *
+ * @param $formelement
+ *   The form element to be checked.
+ * @param $min
+ *   If present the minimum value the element is allowed to have
+ * @param $max
+ *   If present the maximum value the element is allowed to have
+ *
+ * If the element fails any of the tests form_set_error() is called.
+ * Based on code by Coyote see http://drupal.org/node/36899
+ */
+function lm_paypal_is_integer_between($formelement, $min = NULL, $max = NULL) {
+  $thevalue = $formelement['#value'];
+  $fieldname = $formelement['#name'];
+  if (is_numeric($thevalue)) {
+    $thevalue = $thevalue + 0;
+  }
+  else {
+    form_set_error($fieldname, t('Item entered must be an integer.'));
+  }
+  if (!is_int($thevalue)) {
+    form_set_error($fieldname, t('Item entered must be an integer.'));
+  }
+  else {
+    if (isset($min) && ($thevalue < $min)) {
+      form_set_error($fieldname, t('Item entered must be no smaller than:%min', array('%min' => $min)));
+    }
+    elseif (isset($max) && ($thevalue > $max)) {
+      form_set_error($fieldname, t('Item entered must be no greater than:%max', array('%max' => $max)));
+    }
+  }
+}
+
+/**
+ * Register the handler function for a range of item_numbers
+ *
+ * @param $function_name
+ *   The function to call when an item number in the given range arrives
+ * @param $min
+ *   The minimum item_number in the range
+ * @param $max
+ *   The maximum item_number in the range
+ * @return
+ *   If $function_name is set then nothing is returned. If null then
+ *   the entire registered array of ($fun, $min, $max) is returned.
+ */
+/*
+ function lm_paypal_web_accept_register($function_name = NULL, $min = NULL, $max = NULL) {
+  static $ranges = NULL;
+
+  if (is_null($function_name)) {
+    return $ranges;
+  }
+
+  if (is_null($ranges)) {
+    $ranges = array();
+  }
+  $ranges[] = array('fun' => $function_name, 'min' => $min, 'max' => $max);
+}
+*/
+
+
+/**
+ * Mark a saved IPN as processed.
+ *
+ * @param $ipn
+ *  The IPN to be marked.
+ */
+function lm_paypal_mark_processed($ipn) {
+  $update = db_update('lm_paypal_ipns')
+    ->fields(array('processed' => 1))
+    ->condition('id', $ipn->id)
+    ->execute();
+}
+
+function lm_paypal_already_processed($txn_id) {
+  // Has this transaction already been processed?
+  // Changed to allow for echecks which can be payment_status = 'Pending' for
+  //  quite a while
+  $query = db_select('lm_paypal_ipns', 'ipns')
+    ->condition('txn_id', $txn_id)
+    ->condition('processed', 1)
+    ->condition('payment_status', 'Completed');
+  return $query->countQuery()->execute()->fetchField();
+}
+
+/**
+ * Finds the option value corresponding to a period unit
+ *
+ * @param $count
+ *   The number of units
+ * @param $unit
+ *   A period unit such 'D' or 'W'
+ * @return
+ *   The string representation of the unit such as '1 day' or '3 weeks'
+ */
+function lm_paypal_unit2str($count, $unit) {
+  switch ($unit) {
+    case 'D':
+      return format_plural($count, '1 day', '@count days');
+    case 'W':
+      return format_plural($count, '1 week', '@count weeks');
+    case 'M':
+      return format_plural($count, '1 month', '@count months');
+    case 'Y':
+      return format_plural($count, '1 year', '@count years');
+    default:
+      drupal_set_message(t("Unknown unit-type: $unit", 'error'));
+      return $count . ' ' . $unit;
+  }
+}
+
+
+/**
+ * Returns the number of days given a period and unit
+ *
+ * @param $period
+ *   An integer period
+ * @param $unit
+ *   A time unit such as 'D', 'W' ...
+ * @return
+ *   The equivalent number of days
+ */
+function lm_paypal_period_unit2days($period, $unit) {
+  $multiply = 1;
+  switch ($unit) {
+    case 'D':
+      $multiply = 1;
+      break;
+    case 'W':
+      $multiply = 7;
+      break;
+    case 'M':
+      $multiply = 31;
+      break;
+    case 'Y':
+      $multiply = 365;
+      break;
+  }
+
+  return $period * $multiply;
+}
+
+/**
+ * Email a user
+ *
+ * TODO ok young padawan: for tokens, we should use token module, no?
+ * But I don't know, I'm not sure this will usefull.
+ *
+ * @param $to_uid
+ *   The uid of user to send this email to
+ * @param $about_uid
+ *   The uid of the user this email is about
+ * @param $subject
+ *   The subject line of the email (note it will be run thru strtr() and t())
+ * @param $message
+ *   The body of the email (note it will be run thru strtr() and t())
+ * @param $var
+ *   An array of name,value pairs that will be added to the builtin arrary
+ *   before being expanded using strtr()
+ *
+ * Will email the $to_uid user an email. The subject and message will first
+ * be expanded with all the variables being replaced by values.
+ *  In addition to any vars passed in the following are also present
+ * %Username = about_uid's username
+ * %Login = about_uid's login
+ * %Site' = the local site name
+ * %Uri' = the local url
+ * %Uri_brief' = the local url without leading http://
+ * %Mailto = to_uid's email address
+ * %Date' = the date-time
+ * (In case you are wondering why they all begin with a capital letter this
+ *  is to avoid them clashing with db_query's % handling.  There is probably
+ *  a better way around this but there was nothing mentioned in the
+ *  documentation.)
+ */
+function lm_paypal_mail_user($to_uid, $about_uid, $subject, $message, $vars) {
+  // TODO: use Token module
+  global $base_url;
+
+  if (lm_paypal_debug()) {
+    watchdog(LM_PAYPAL, "lm_paypal_mail_user($to_uid, $about_uid, $subject, $message, $vars)", NULL);
+  }
+
+  $to_account = user_load($to_uid);
+  $to = $to_account->mail;
+
+  $about_user = user_load($about_uid);
+
+  //TODO: Maybe use the subscription adminstrators email instead?
+  $from = variable_get('site_mail', ini_get('sendmail_from'));
+
+  $variables = array(
+    '%Username' => $about_user->name,
+    '%Login' => $about_user->login,
+    '%Site' => variable_get('site_name', 'drupal'),
+    '%Uri' => $base_url,
+    '%Uri_brief' => substr($base_url, strlen('http://')),
+    '%Mailto' => $to,
+    '%Date' => format_date(time()),
+  );
+  $variables = $variables + $vars;
+
+  $body = strtr(t($message), $variables);
+  $subject = strtr(t($subject), $variables);
+
+  watchdog(LM_PAYPAL, 'Sending mail to: ' . $to, NULL);
+
+  //drupal_mail('lm_paypal', $to, $subject, $body, $from);
+
+  $params['subject'] = $subject;
+  $params['body'] = $body;
+
+  $func = 'drupal_mail';
+  $args = array('lm_paypal', 'notify', $to, user_preferred_language($to_account), $params);
+
+  call_user_func_array($func, $args);
+}
+
+function lm_paypal_mail($key, &$message, $params) {
+  // TODO: stuff needs moving here from above function!
+  switch ($key) {
+    case 'notify':
+      // $language = $message['language'];
+      $message['subject'] = $params['subject'];
+      $message["body"] = array($params["body"]);
+      break;
+  }
+}
+
+/**
+ * Extract data from the 'custom' field in an IPN.  The old way LM Paypal did it
+ * was by bit-packing into a 32-bit integer. The new way is PHP serialized data.
+ *
+ * @return array
+ *   An associative array with at least 'uid' and 'other'
+ */
+function lm_paypal_unpack_ipn_custom($ipn) {
+  if ($ipn && isset($ipn->custom)) {       
+    if (is_int($ipn->custom)) {
+      // Old bit-packing format for 'custom'. The uid is in the bottom of 'custom'
+      return array('uid' => $ipn->custom & 0xFFFF, 'other' => ($ipn->custom >> 16) & 0xFFFF);
+    }
+    else {
+      // New serialized data
+      return @unserialize($ipn->custom); // In case the passed string is not unserializeable, FALSE is returned and E_NOTICE is issued.
+    }
+  }
+  else {
+    // Not set
+    return array();
+  }
+}

@@ -1,0 +1,17 @@
+name = "lm_paypal_features"
+description = "Implement an integration of lm_paypal with features module in order to create an ability to export module settings, subscriptions"
+package = "Features lm paypal"
+core = "7.x"
+
+dependencies[] = lm_paypal
+dependencies[] = lm_paypal_subscriptions
+dependencies[] = features
+dependencies[] = ctools
+
+
+; Information added by drupal.org packaging script on 2013-09-30
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "lm_paypal"
+datestamp = "1380585190"
+

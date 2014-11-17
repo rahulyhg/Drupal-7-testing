@@ -1,0 +1,178 @@
+<?php
+
+require_once(drupal_get_path('module', 'lm_paypal').'/tests/paid_adverts.test');
+
+class LmPaypalPaidAdvertsAPITestCase extends AbstractLmPaypalPaidAdvertsTestCase {
+
+  static function getInfo() {
+    return array(
+      'name' => t('Paid Adverts: basics and API'),
+      'description' => t('Test all internal API methods, needed for the module to work and eventually interact with other modules.'),
+      'group' => t('LM Paypal'),
+    );
+  }
+
+  /**
+   * SimpleTest core method: code run before each and every test method.
+   */
+  function setUp() {
+    // Always call the setUp() function from the parent class.
+    parent::setUp('lm_paypal_subscriptions', 'lm_paypal_paid_adverts_api');
+  }
+
+  /**
+   * SimpleTest core method: code run after each and every test method.
+   */
+  function tearDown() {
+    // Always call the tearDown() function from the parent class.
+    parent::tearDown();
+  }
+
+  function testPaidAdvertAPI() {
+    // Create a new subscription
+    $this->drupalLogin($this->admin_user);
+    $this->drupalGet('admin/config/lm_paypal/paid_adverts/settings');
+    list($sub_id, $subscription) = $this->_createNodeSubscription();
+
+    // Logout and login as a custom user
+    $this->drupalLogout();
+    $this->drupalLogin($this->web_user);
+
+    // Create a subscribable node
+    $node_handled = $this->_createNode('page', array(), TRUE);
+    // And another which is not
+    $node_not_handled = $this->_createNode('article', array(), TRUE);
+
+    // Logout and login as admin user
+    $this->drupalLogout();
+    $this->drupalLogin($this->admin_user);
+
+    // Test basic API handle functions for handled node
+    $live = lm_paypal_paid_adverts_get_live_subscriptions($node_handled->type);
+    $this->assertEqual(count($live), 1, 'Type page has only one possible subscription');
+    $this->assertTrue(lm_paypal_paid_adverts_type_is_handled($node_handled->type),
+      'lm_paypal_paid_adverts_type_is_handled with first node returns TRUE');
+    $this->assertTrue(lm_paypal_paid_adverts_node_is_handled($node_handled),
+      'lm_paypal_paid_adverts_node_is_handled with first node returns TRUE');
+    // And for not handled node
+    $live = lm_paypal_paid_adverts_get_live_subscriptions($node_not_handled->type);
+    $this->assertEqual(count($live), 0, 'Type article has no possible subscriptions');
+    $this->assertFalse(lm_paypal_paid_adverts_type_is_handled($node_not_handled->type),
+      'lm_paypal_paid_adverts_type_is_handled with first node returns FALSE');
+    $this->assertFalse(lm_paypal_paid_adverts_node_is_handled($node_not_handled),
+      'lm_paypal_paid_adverts_node_is_handled with first node returns FALSE');
+
+    // Test access function for handled node
+    $this->assertTrue(lm_paypal_paid_adverts_paypal_access(
+      $node_handled, $this->admin_user), 'admin can access handle node payment');
+    $this->assertTrue(lm_paypal_paid_adverts_paypal_access(
+      $node_handled, $this->web_user), 'owner can access handle node payment');
+    $this->assertTrue(lm_paypal_paid_adverts_paypal_access(
+      $node_handled, $this->paypal_admin_user), 'lm_paypal admin can access handle node payment');
+    $this->assertFalse(lm_paypal_paid_adverts_paypal_access(
+      $node_handled, $this->observer_user), 'other user can not handle node access payment');
+    // And for not handled node
+    $this->assertFalse(lm_paypal_paid_adverts_paypal_access(
+      $node_not_handled, $this->admin_user), 'admin can not access handle node payment');
+    $this->assertFalse(lm_paypal_paid_adverts_paypal_access(
+      $node_not_handled, $this->web_user), 'owner can not access handle node payment');
+    $this->assertFalse(lm_paypal_paid_adverts_paypal_access(
+      $node_not_handled, $this->paypal_admin_user), 'owner can not access handle node payment');
+    $this->assertFalse(lm_paypal_paid_adverts_paypal_access(
+      $node_not_handled, $this->observer_user), 'other user can not handle node access payment');
+
+    // Now, disable all subscriptions type
+    db_query("UPDATE {lm_paypal_subscriptions} SET status = 0");
+    $this->assertNoWatchdogErrors(WATCHDOG_ERROR, FALSE);
+    // And delete static cache
+    lm_paypal_paid_adverts_get_live_subscriptions(NULL, TRUE);
+    // And reload our nodes reseting the cache
+    $node_handled = node_load($node_handled->nid, NULL, TRUE);
+    $node_not_handled = node_load($node_not_handled->nid, NULL, TRUE);
+
+    // And test basic API again for handled node
+    $live = lm_paypal_paid_adverts_get_live_subscriptions($node_handled->type);
+    $this->assertEqual(count($live), 0, 'Type page has only one possible subscription anymore');
+    $this->assertFalse(lm_paypal_paid_adverts_type_is_handled($node_handled->type),
+      'lm_paypal_paid_adverts_type_is_handled with first node returns FALSE now');
+    $this->assertFalse(lm_paypal_paid_adverts_node_is_handled($node_handled),
+      'lm_paypal_paid_adverts_node_is_handled with first node returns FALSE now');
+
+    // And also, access functions
+    $this->assertFalse(lm_paypal_paid_adverts_paypal_access(
+      $node_handled, $this->admin_user), 'admin can not access handle node payment anymore');
+    $this->assertFalse(lm_paypal_paid_adverts_paypal_access(
+      $node_handled, $this->web_user), 'owner can not access handle node payment anymore');
+    $this->assertFalse(lm_paypal_paid_adverts_paypal_access(
+      $node_handled, $this->paypal_admin_user), 'lm_paypal admin can not access handle node payment anymore');
+    $this->assertFalse(lm_paypal_paid_adverts_paypal_access(
+      $node_handled, $this->observer_user), 'other user can not handle node access payment');
+  }
+
+  function testPaidAdvertVisibility() {
+    // Log as admin
+    $this->drupalLogin($this->admin_user);
+
+    // Create a new subscription
+    $this->drupalGet('admin/config/lm_paypal/paid_adverts/settings');
+    list($sub_id, $subscription) = $this->_createNodeSubscription();
+
+    // Logout and login as a custom user
+    $this->drupalLogout();
+    $this->drupalLogin($this->web_user);
+
+    // Create a new node
+    $node = $this->_createNode('page', array(), TRUE);
+
+    // Check tabs visibility
+    $this->drupalGet('node/'.$node->nid);
+    $this->assertText("Paypal publication");
+    $this->assertText("This classified ad for subscription #$sub_id is still unpaid. Other users will not be able to access it.");
+
+    // Check we don't have unpay links
+    $this->assertNoText("Mark as paid");
+
+    // Logout and login as another custom user
+    $this->drupalLogout();
+    $this->drupalLogin($this->observer_user);
+
+    // Check we can't see any data about that node
+    $this->drupalGet('node/'.$node->nid);
+    $this->assertWatchdogError('IPN web_accept no uid, found payer_email%%');
+    $this->assertNoText($node->body['und'][0]['value']);
+    $this->assertNoText("Paypal subscription");
+    $this->assertNoText("This classified ad for subscription #$sub_id is still unpaid. Other users will not be able to access it.");
+
+    // Neither the unpay links
+    $this->assertNoText("Mark as paid");
+
+    // Logout and login as admin user
+    $this->drupalLogout();
+    $this->drupalLogin($this->admin_user);
+
+    // Check we can see then node, and see the unpay links
+    $this->drupalGet('node/'.$node->nid);
+    $body = str_replace("<!--break-->", "", $node->body['und'][0]['value']);
+    $this->assertText($body);
+    // No idea why, this one fails as admin
+    // $this->assertText("Paypal subscription");
+    $this->assertText("This classified ad for subscription #$sub_id is still unpaid. Other users will not be able to access it.");
+
+    // Unpay the node
+    $this->clickLink("Mark as paid");
+    $this->assertText('Mark node '.$node->nid.' as paid');
+    $this->drupalPost(NULL, array(), t('Mark subscription as paid'));
+
+    // Check links disapeared
+    $this->assertNoText('Mark as paid');
+
+    // Logout and login as another custom user again
+    $this->drupalLogout();
+    $this->drupalLogin($this->observer_user);
+
+    // Check we can read the node
+    $this->drupalGet('node/'.$node->nid);
+    $body = str_replace("<!--break-->", "", $node->body['und'][0]['value']);
+    $this->assertText($body);
+  }
+}
