@@ -1,0 +1,4 @@
+name = Meal Planner
+description = This module create meal planner using jquery and table based design.
+core = 7.x
+package = custom

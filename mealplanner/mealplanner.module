@@ -1,0 +1,259 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ **/
+function mealplanner_menu() {
+  $items = array();
+
+  $items['mealplanner/add'] = array(
+    'title' => 'Add meal planner',
+    'page callback' => 'add_meal_planner',
+    'access arguments' => array('access content'),
+  );
+
+  $items['mealplanner/%/edit'] = array(
+    'title' => 'Meal planner',
+    'page callback' => 'update_meal_planner',
+    'page arguments' => array(1),
+    'type' => MENU_NORMAL_ITEM,
+    'access arguments' => array('access content'),
+  );
+  
+  $items['mealplanner/add-meal/%'] = array(
+    'title' => 'Add new meal planner',
+    'page callback' => 'add_meal_to_planner',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+  );
+  return $items;
+}
+
+function mealplanner_url_outbound_alter(&$path, &$options, $original_path) {
+  // if (preg_match('|^node/([0-9]*)/edit(/.*)?|', $path, $matches)) {
+  //   if ($node->nid == $matches[1]) {
+  //     $path = 'node/edit/$node->nid' . $matches[2];
+  //   }
+  // }
+}
+
+function pr($data){
+ print "<pre>";
+ print_r($data);
+ print "</pre>";
+}
+
+//updating meal planner 
+function add_meal_planner(){
+
+  //creating node 
+  // $node = new stdClass();
+  // $node->type = 'meal_planner';
+  // $node->title    = 'auto title on ' . date('c');
+  // $node->language = LANGUAGE_NONE;
+  // $node->field_monday['und'][0]['value'] = 18;
+
+  // node_object_prepare($node);
+  // node_save($node);
+
+
+	$node = node_load(122);
+     //$ref_nid = 13;
+  /********************************************************************/
+    
+//creating collection field item to node.
+    // $fc_item = entity_create('field_collection_item', array('field_name' => 'field_monday'));
+    // // Get field collection item value.
+    // $fc_item->setHostEntity('node', $node);
+
+    // $fc_item->field__lunch[LANGUAGE_NONE][]['nid'] = $ref_nid;
+    // $fc_item->save();
+
+  /*********************************************************************/
+
+     
+ 
+   
+
+ //    $fcv = $node->field_monday[LANGUAGE_NONE][0]['nid'];
+
+ //    $fci = entity_load('field_collection_item', array($fcv));
+ // // Load that field collection item.
+ //    $fci->field__lunch = array([LANGUAGE_NONE][0]['nid'] = $ref_nid;
+ //    $fci->save();
+
+     //node_save($node);
+    //drupal_set_message("Node updated successfully!".$node->nid);
+    //drupal_goto("mealplanner/".$node->nid."/edit");
+
+/**************************************************************************/
+// Load the node by NID
+// Wrap it with Entity API
+//$node = entity_metadata_wrapper('node', $raw_node);
+// Get the first item from the muli-value field collection
+//$raw_collection = $node->field_monday->value();
+// Wrap it with Entity API
+// $collection = entity_metadata_wrapper('field_collection_item', $raw_collection);
+//dsm the old value
+ pr($node);
+// Set a new value on the field_example textfield.
+// $collection->field__snack_1->set(array(13));
+// $collection->field__snack_2->set(array(13,7));
+// // Save the changes to the entity
+// $collection->save();
+
+//return "updated";
+
+}
+
+//adding meal to the selected planner.
+function add_meal_to_planner($arg){
+    $pnid = variable_get('pnid');
+	$name = $_POST['Name'];
+	$pid = $_POST['Pid'];
+	
+	print "nid-> ".$arg." Pid-> ".$pid." Pnid-> ".$pnid;
+    
+    //node load.
+    $raw_node = node_load($pnid);
+    
+    // Wrap it with Entity API.
+    $node = entity_metadata_wrapper('node', $raw_node);
+    
+    //node field update start from here indivisually
+      
+      //field monday
+    if($pid == 'ms-00'){
+       $node->title = 'Updated Title Text ms-00';
+       $raw_collection = $node->field_monday->value();
+       $collection = entity_metadata_wrapper('field_collection_item', $raw_collection);
+       $collection->field__snack_1->set(array($arg));
+    }elseif ($pid == 'ms-10') {
+    	$node->title = 'Updated Title Text ms-10';
+    	$raw_collection = $node->field_monday->value();
+        $collection = entity_metadata_wrapper('field_collection_item', $raw_collection);
+        $collection->field__lunch->set(array($arg));
+    }elseif ($pid == 'ms-20') {
+    	$node->title = 'Updated Title Text ms-20';
+    	$raw_collection = $node->field_monday->value();
+        $collection = entity_metadata_wrapper('field_collection_item', $raw_collection);
+        $collection->field__snack_2->set(array($arg));
+    }elseif ($pid == 'ms-30') {
+    	$node->title = 'Updated Title Text ms-30';
+    	$raw_collection = $node->field_monday->value();
+        $collection = entity_metadata_wrapper('field_collection_item', $raw_collection);
+        $collection->field__dinner->set(array($arg));
+    }elseif ($pid == 'ms-40') {
+    	$node->title = 'Updated Title Text ms-40';
+    	$raw_collection = $node->field_monday->value();
+        $collection = entity_metadata_wrapper('field_collection_item', $raw_collection);
+        $collection->field__dessert->set(array($arg));
+
+        /*****************field tuesday start from here********************************/
+
+    }elseif($pid == 'ms-01'){
+       $node->title = 'Updated Title Text ms-01';
+       $raw_collection = $node->field_tuesday->value();
+       $collection = entity_metadata_wrapper('field_collection_item', $raw_collection);
+       $collection->field__snack_1->set(array($arg));
+    }elseif ($pid == 'ms-11') {
+    	$node->title = 'Updated Title Text ms-11';
+    	$raw_collection = $node->field_tuesday->value();
+        $collection = entity_metadata_wrapper('field_collection_item', $raw_collection);
+        $collection->field__lunch->set(array($arg));
+    }elseif ($pid == 'ms-21') {
+    	$node->title = 'Updated Title Text ms-21';
+    	$raw_collection = $node->field_tuesday->value();
+        $collection = entity_metadata_wrapper('field_collection_item', $raw_collection);
+        $collection->field__snack_2->set(array($arg));
+    }elseif ($pid == 'ms-31') {
+    	$node->title = 'Updated Title Text ms-31';
+    	$raw_collection = $node->field_tuesday->value();
+        $collection = entity_metadata_wrapper('field_collection_item', $raw_collection);
+        $collection->field__dinner->set(array($arg));
+    }elseif ($pid == 'ms-41') {
+    	$node->title = 'Updated Title Text ms-41';
+    	$raw_collection = $node->field_tuesday->value();
+        $collection = entity_metadata_wrapper('field_collection_item', $raw_collection);
+        $collection->field__dessert->set(array($arg));
+    }
+    
+    $collection->save();
+    //node_save($node);
+}
+
+function update_meal_planner($arg){
+   variable_set('pnid',$arg);
+   $headers = array(
+     array('data' => t('MONDAY')),
+     array('data' => t('TUESDAY')),
+     array('data' => t('WEDNESDAY')),
+     array('data' => t('THURSDAY')),
+     array('data' => t('FRIDAY')),
+     array('data' => t('SATURDAY')),
+     array('data' => t('SUNDAY')),
+   );
+   
+   //initializing array.
+   $rows  = array();
+   $days = array();
+   $ms = array();
+   
+   //adding js for ajax.
+   drupal_add_js(drupal_get_path('module', 'mealplanner') . '/js/meal.js');
+
+
+   // $ms[0] = l('+ SNACK', 'testing-for-ajax', array('attributes' => array('class' => 'colorbox-load'), 'query' => array('width' => 640, 'height' => 480,'template' => 'colorbox','iframe'=>'true')));
+
+   //meal schedule for every day.
+   $cbox = array('attributes' => array('class' => 'colorbox-load'), 'query' => array('width' => 640, 'height' => 480,'template' => 'colorbox','iframe'=>'true'));
+
+   $ms[0] =  l('+ SNACK','testing-for-ajax',$cbox);
+   $ms[1] =  l('+ LUNCH','testing-for-ajax',$cbox);
+   $ms[2] =  l('+ SNACK','testing-for-ajax',$cbox);
+   $ms[3] =  l('+ DINNER','testing-for-ajax',$cbox);
+   $ms[4] =  l('+ DESSERT','testing-for-ajax',$cbox);
+
+   //generating table for meal planner.
+   for ($i=0; $i < 5; $i++) { 
+
+   		for ($j=0; $j <7 ; $j++) { 
+   			$days[$j] = '<div id="ms-'.$i.$j.'">'.$ms[$i].'</div>';
+   		}
+   		$rows[$i] = $days;
+   }
+
+   $table = theme_table(
+     array(
+       "header" => $headers,
+        "rows" => $rows,
+        "attributes" => array(),
+        "sticky" => true, // Table header will be sticky
+        "caption" => "please select you recipe for each day of week",
+        "colgroups" => array(),
+        "empty" => t("no information added!")
+      ));
+   $formtable = drupal_get_form('get_table_of_content_form');
+   $output = drupal_render($formtable).$table;
+   return $output;
+}
+
+/**
+ * Implementation of  hook_form().
+ **/
+
+function get_table_of_content_form($form, &$form_state) {
+
+  $form['title'] = array(
+     '#type' => 'textfield',
+     '#title' => t('Title'),
+     '#default_value' => 'This is defaule title',
+     '#required' => TRUE,
+     '#disabled'=>TRUE,
+   ); 
+   return $form;
+}
+
+function get_table_of_content_form_submit($form_id, &$form_state){
+    
+}
