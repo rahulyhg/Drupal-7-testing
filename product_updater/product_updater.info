@@ -1,0 +1,5 @@
+name = Aroyi Product Updater
+description = Update product price and information using API request of different retailer like Amazon, Best Buy, Sears etc.
+package = custom
+core = 7.x
+configure = admin/config/aroyi-product

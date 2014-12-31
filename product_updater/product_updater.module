@@ -1,0 +1,332 @@
+<?php
+
+ module_load_include('inc', 'product_updater', 'admin.forms');
+
+/**
+ * Implements hook_permission()
+ */
+
+function product_updater_permission() {
+  return array(
+    'administer uploader' => array(
+      'title' => t('Aroyi product updater'),
+      'description' => t('Allow the following roles to use aroyi product updater.'),
+    ),
+  );
+}
+ 
+/**
+ * Implements hook_menu()
+ */
+
+function product_updater_menu() {
+  $items['admin/config/aroyi-product'] = array(
+     'title' => 'Aroyi Product Updater',
+     'position' => 'left',
+     'weight' => -100,
+     'page callback' => 'system_admin_menu_block_page',
+     'access arguments' => array('administer site configuration'),
+     'file' => 'system.admin.inc',
+     'file path' => drupal_get_path('module', 'system'),
+  );
+  $items['admin/config/aroyi-product/update-products'] = array(
+    'title' => 'Update products information',
+    'description' => 'Update product information by importing a csv file.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('product_updater_form'),
+    'access arguments' => array('administer uploader'),
+  );
+  $items['admin/config/aroyi-product/products-info'] = array(
+    'title' => 'Products information',
+    'description' => 'Check products information.',
+    'page callback' => 'get_price_list',
+    'access arguments' => array('administer uploader'),
+  );
+  $items['admin/config/aroyi-product/products-settings'] = array(
+    'title' => 'Update products settings',
+    'description' => 'Update product information settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('product_updater_setting_form'),
+    'access arguments' => array('administer uploader'),
+  );
+  return $items;
+}
+
+
+/**
+ * fetch value from price list table.
+ */
+
+function get_price_list(){
+  
+  $headers = array(
+     array('data' => t('abr_model')),
+     array('data' => t('manufacturer')),
+     array('data' => t('amazon_no')),
+     array('data' => t('wm_item_id')),
+     array('data' => t('wm_model_no')),
+     array('data' => t('sears_item_id')),
+     array('data' => t('sears_model_no')),
+     array('data' => t('bb_item_id')),
+     array('data' => t('bb_model_no')),
+   );
+   
+   $rows  = array();
+   $query = db_select('aroyi_price_list', 'apl')->extend('PagerDefault')->limit(30);
+   $query-> fields('apl');
+   $result = $query->execute();
+
+   foreach ($result as $row) {
+     $rows[] = array($row->abr_model,$row->manufacturer,$row->amazon_no,$row->wm_item_id,$row->wm_model_no,$row->sears_item_id,$row->sears_model_no,$row->bb_item_id,$row->bb_model_no);
+   }
+
+   $table = theme_table(
+     array(
+       "header" => $headers,
+        "rows" => $rows,
+        "attributes" => array(),
+        "sticky" => true, // Table header will be sticky
+        "caption" => "<h3>Your last uploaded csv products information.</h3>",
+        "colgroups" => array(),
+        "empty" => t('No products information uploaded yet. Upload information from '.l('Update product information','admin/config/aroyi-product/update-products'))
+      )).theme("pager");
+   return $table;
+}
+
+/**
+ * This function runs in batch and update aroyi_price_list table with uploaded csv file information.
+ */
+
+function product_updater_batch_processing($data) {
+
+  $abr_model      = $data[0];  //corresponding to column 1 in a csv file that is abr_model and so on.
+  $manufacturer   = $data[1];
+  $model_no       = $data[2];
+  $amazon_no      = $data[3];
+  $wm_item_id     = $data[4];
+  $wm_model_no    = $data[5];
+  $sears_item_id  = $data[6];
+  $sears_model_no = $data[7];
+  $bb_item_id     = $data[8];
+  $bb_model_no    = $data[9];
+
+  $query = db_query("SELECT id FROM {aroyi_price_list} WHERE abr_model = :abrm",
+   array(':abrm' => $data[0]));
+
+  $result =$query->fetchObject();
+
+  if($query->rowCount()>0) {               //update record with relevant infomation.
+    db_update('aroyi_price_list')
+      ->fields(array(
+        'manufacturer'   => $data[1],
+        'model_no'       => $data[2],
+        'amazon_no'      => $data[3],
+        'wm_item_id'     => $data[4],
+        'wm_model_no'    => $data[5],
+        'sears_item_id'  => $data[6],
+        'sears_model_no' => $data[7],
+        'bb_item_id'     => $data[8],
+        'bb_model_no'    => $data[9],
+      ))
+      ->condition('id',$result->id, '=')
+      ->execute();
+
+  }else{                       //insert record with relevant infomation.
+    db_insert('aroyi_price_list')
+      ->fields(array(
+        'abr_model'      => $data[0],
+        'manufacturer'   => $data[1],
+        'model_no'       => $data[2],
+        'amazon_no'      => $data[3],
+        'wm_item_id'     => $data[4],
+        'wm_model_no'    => $data[5],
+        'sears_item_id'  => $data[6],
+        'sears_model_no' => $data[7],
+        'bb_item_id'     => $data[8],
+        'bb_model_no'    => $data[9]
+      ))->execute();
+  }
+  
+  $query = db_query("SELECT entity_id FROM {field_data_field_product_tv_model} WHERE 
+    field_product_tv_model_value = :ptm", array(':ptm' => $data[0]));
+  $result =$query->fetchObject();
+
+  if($query->rowCount()>0) {    
+    $entity_id = $result->entity_id;
+    batch_update_node_type_product_tv_price($entity_id);
+  }
+}
+
+/**
+ * This function runs when the batch processing is complete.
+ */
+
+function product_updater_form_finished() {
+  drupal_set_message(t('Products updated successfully! check infomation from '.l('here','admin/config/aroyi-product/products-info')));
+   watchdog('Product updater','Products infomation updated');
+}
+
+/**
+ * API request for wallmart product price. 
+ */
+
+function wallMart($wm_item_id){ 
+  $base_url = 'http://walmartlabs.api.mashery.com/';
+  $apiKey = 'hvxz4kgawvsu6psfe24t7v6t';
+  $url = $base_url.'v1/items/'.$wm_item_id.'?format=json&apiKey='.$apiKey;
+  $json_res = drupal_http_request($url);
+
+  if (in_array( $json_res->code, array(200, 304))) {
+    $data = json_decode($json_res->data);
+    return $data->salePrice;
+  }
+  else {
+    return null;
+  }
+}
+
+/**
+ * API request for Best buy product price. 
+ */
+
+function best_buy($bb_item_id){
+  $base_url = 'http://api.remix.bestbuy.com/';
+  $apiKey = '4jwaeh6y8qfdh5fnb2y3xg3x';
+  $url = $base_url.'v1/products(productId='.$bb_item_id.')?format=json&show=salePrice&apiKey='.$apiKey;
+  $json_res = drupal_http_request($url);
+  $data = json_decode($json_res->data);
+
+  if (in_array( $json_res->code, array(200, 304)) && $data->total) {
+    return $data->products[0]->salePrice;
+  }
+  else {
+    return null;
+  }
+}
+
+/**
+ * API request for Sears product price. 
+ */
+
+function sears($sears_item_id){
+  $base_url = 'http://api.developer.sears.com/';
+  $api_url  = 'v2.1/products/search/Sears/json/keyword/';
+  $apiKey   = '?apikey=0biNhAs3RAoE3S9fiKMJrUA2kTurD442';
+  $url = $base_url.$api_url.$sears_item_id.$apiKey;
+  $json_res = drupal_http_request($url);
+  $data = json_decode($json_res->data);
+
+  if (in_array( $json_res->code, array(200, 304)) && $data->SearchResults->ProductCount) {
+    return $data->SearchResults->Products[0]->Price->DisplayPrice;
+  }
+  else {
+    return null;
+  }
+}
+
+/**
+ * Update node field price with different retailer's price.
+ */
+
+function update_node_price_with_retailer_api($model_no,$retailer){
+ $query = db_query("SELECT wm_item_id,bb_item_id,sears_item_id FROM {aroyi_price_list} WHERE abr_model = :model",
+ array(':model' => $model_no));
+ $result =$query->fetchObject();
+  if($query->rowCount()>0){
+    if(!empty($result->wm_item_id) && $retailer=='WAL') {          
+      $price = wallMart($result->wm_item_id);
+      return $price;
+    }
+    else if(!empty($result->bb_item_id) && $retailer=='BEB') {
+    	$price = best_buy($result->bb_item_id);   
+     	return $price;
+    }
+    else if(!empty($result->sears_item_id) && $retailer=='SRS') {
+     	$price = sears($result->sears_item_id);
+     	return $price;   
+    }
+    else{
+     	return null;
+    }
+  }
+  else{
+  	return null;
+  }
+}
+
+/**
+ * Update node field price with different retailer's price of content type product tv with batch.
+ */
+
+function batch_update_node_type_product_tv_price($node_id){
+   $node_info = node_load($node_id);
+   $node_wrapper = entity_metadata_wrapper('node', $node_info);
+   $retailer = explode('_', $node_wrapper->title->value());
+   $price = update_node_price_with_retailer_api($node_wrapper->field_product_tv_model->value(),$retailer[1]);
+   $node_wrapper->field_product_tv_price->set($price);
+   $node_wrapper->save();
+}
+
+/**
+ * Update node field price with different retailer's price of content type product tv.
+ */
+
+function cron_update_node_type_product_tv_price(){
+ 
+  //Query for updating node price of Walmart type
+  $type = 'product_tv';
+  $query = db_select('node', 'n')
+    ->fields('n', array('nid'))
+    ->condition('type',$type)
+    ->condition('title', '%' . db_like('_WAL') . '%', 'LIKE');
+  $nids = $query->execute();
+   
+  foreach($nids as $nid){   
+    $node_info = node_load($nid->nid);
+    $node_wrapper = entity_metadata_wrapper('node', $node_info);
+    $price = update_node_price_with_retailer_api($node_wrapper->field_product_tv_model->value(),'WAL');
+    $node_wrapper->field_product_tv_price->set($price);
+    $node_wrapper->save();
+  }
+   
+  //Query for updating node price of Best Buy type
+  $query = db_select('node', 'n')
+	  ->fields('n', array('nid'))
+	  ->condition('type',$type)
+	  ->condition('title', '%' . db_like('_BEB') . '%', 'LIKE');
+  $nids = $query->execute();
+
+  foreach($nids as $nid){
+    $node_info = node_load($nid->nid);
+    $node_wrapper = entity_metadata_wrapper('node', $node_info);
+    $price = update_node_price_with_retailer_api($node_wrapper->field_product_tv_model->value(),'BEB');
+    $node_wrapper->field_product_tv_price->set($price);
+    $node_wrapper->save();
+  }
+
+  //Query for updating node price of Sears type
+  $query = db_select('node', 'n')
+	  ->fields('n', array('nid'))
+	  ->condition('type',$type)
+	  ->condition('title', '%' . db_like('_SRS') . '%', 'LIKE');
+  $nids = $query->execute();
+
+  foreach($nids as $nid){
+    $node_info = node_load($nid->nid);
+    $node_wrapper = entity_metadata_wrapper('node', $node_info);
+    $price = update_node_price_with_retailer_api($node_wrapper->field_product_tv_model->value(),'SRS');
+    $node_wrapper->field_product_tv_price->set($price);
+    $node_wrapper->save();    
+  }
+}
+
+/**
+ * Update node field price with different retailer's price on cron run.
+ */
+
+function product_updater_cron(){
+  if(variable_get('pcrn_setting',0)){
+    cron_update_node_type_product_tv_price();
+    watchdog('Cron product_updater ','Products infomation updated!');
+  }
+}

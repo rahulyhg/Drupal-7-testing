@@ -1,0 +1,102 @@
+<?php 
+/**
+ * @file
+ * Database Installation
+ * 
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+ function product_updater_schema() {
+
+  $schema['aroyi_price_list'] = array(
+    'description' => 'Aroyi price list.',
+    'fields' => array(
+       'id' => array(
+         'description' => 'The primary identifier.',
+         'type' => 'serial',
+         'unsigned' => TRUE,
+         'not null' => TRUE
+       ),
+       'abr_model' => array(
+         'description' => 'Product AbrModel',
+         'type' => 'varchar',
+         'length' => '255',
+         'default' => ''
+       ),
+       'manufacturer' => array(
+         'description' => 'Product Manufacturer',
+         'type' => 'varchar',
+         'length' => '255',
+         'default' => ''
+       ),
+       'model_no' => array(
+         'description' => 'Product Model number',
+         'type' => 'varchar',
+         'length' => '255',
+         'default' => ''
+       ),       
+       'amazon_no' => array(
+         'description' => 'Product amazon ASIN Number',
+         'type' => 'varchar',
+         'length' => '255',
+         'default' => ''
+       ),
+       'wm_item_id' => array(
+         'description' => 'Product Walmart item id',
+         'type' => 'varchar',
+         'length' => '255',
+         'default' => ''
+       ),
+       'wm_model_no' => array(
+         'description' => 'Product Walmart item number',
+         'type' => 'varchar',
+         'length' => '255',
+         'default' => ''
+       ),
+       'sears_item_id' => array(
+         'description' => 'Product Sears item id',
+         'type' => 'varchar',
+         'length' => '255',
+         'default' => ''
+       ),
+       'sears_model_no' => array(
+         'description' => 'Product Sears item number',
+         'type' => 'varchar',
+         'length' => '255',
+         'default' => ''
+       ),
+       'bb_item_id' => array(
+         'description' => 'Product Best Buy item id',
+         'type' => 'varchar',
+         'length' => '255',
+         'default' => ''
+       ),
+       'bb_model_no' => array(
+         'description' => 'Product Best Buy item number',
+         'type' => 'varchar',
+         'length' => '255',
+         'default' => ''
+       )
+    ),
+    'primary key' => array('id'),
+  );
+  
+  return $schema;
+ }
+
+/**
+ * Implementation of hook_install().
+ */
+ function product_updater_install() {
+   
+ }
+
+ /**
+ * Implementation of hook_uninstall().
+ */
+ function product_updater_uninstall() {
+   variable_del('pcrn_setting'); 
+ }
+ 
