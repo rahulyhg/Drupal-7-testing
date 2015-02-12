@@ -1,0 +1,210 @@
+<?php 
+
+module_load_include('inc', 'sps_register', 'admin.forms');
+module_load_include('inc', 'sps_register', 'access.callback');
+
+/**
+ * Implements hook_menu()
+ */
+function sps_register_menu() {
+  $items['sps/register/process'] = array(
+    'title' => 'Registration',
+    'description' => 'Registration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => '_sps_register_description_form',
+    'access arguments' => array('access content'),
+  );
+  $items['sps/user/register'] = array(
+    'title' => 'Join',
+    'description' => 'Join',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sps_register_form'),
+    'access arguments' => array('access content'),
+    'access callback' => array('has_user_visited_sps_registration'),
+  );
+  $items['sps/user/success-roster'] = array(   //user login status page.
+    'title' => 'Welcome',
+    'description' => 'Registration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sps_success_roster_form'),
+    'access arguments' => array('access content'),
+    'access callback' => array('has_user_roaster_info'),
+  );
+  $items['sps/user/falure-roster'] = array(
+    'title' => 'Thank You!',
+    'description' => 'Registration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sps_falure_roster_form'),
+    'access arguments' => array('access content'),
+    'access callback' => array('has_user_roaster_no_info'),
+  );
+  $items['sps/user/additional-info'] = array(
+    'title' => 'Additional Details',
+    'description' => 'Registration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sps_additional_details_form'),
+    'access arguments' => array('access content'),
+  );
+  $items['sps/user/thank-you'] = array(
+    'title' => 'Thank You!',
+    'description' => 'Registration',
+    'page callback' => 'sps_register_thanku',
+    'access arguments' => array('access content'),
+  );
+  $items['sps/user/%/validate/%/%'] = array( //user validate by ajax
+    'page callback' => array('sps_user_validate'),
+    'page arguments' => array(2, 4 , 5),
+    'access arguments' => array('access content'),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['sps/validate/users/%'] = array( //user validate section 
+    'title' => 'Validate',
+    'description' => 'SPS user validation',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sps_validate_users_form', 3),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  $items['sps/user/invites/by-mail'] = array( // E-mail invites.
+    'title' => 'Invite SPS people you know',
+    'description' => 'Registration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sps_user_invite_by_mail_form'),
+    'access arguments' => array('access content'),
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+function sps_register_menu_alter(&$items) {
+  $items['user/register']['page arguments'] = array('_sps_register_description_form');
+  return $items;
+} 
+
+/**
+ * implimentation of hook_user_login()
+ */
+function sps_register_user_login(&$edit, $account) {
+  $result = db_select('sps_user_reg_status', 'u')
+    ->fields('u')
+    ->condition('uid', $account->uid,'=')
+    ->execute()
+    ->fetchObject();
+  $current_menu_item = menu_get_item();
+  if ($current_menu_item['path'] == 'user/reset/%/%/%' || $current_menu_item['path'] == 'sps/user/validate/%/%/%') {
+    return; // Don't redirect on password reset or sps user validate.
+  }
+  if(!empty($result))
+  $_GET['destination'] = $result->cur_path; // Redirect user to profile page after the login.
+}
+
+/**
+ * implimentation of hook_user_update()
+ */
+function sps_register_user_update(&$edit, $account) {
+	global $user;
+	$result = db_select('sps_user_reg_status', 'u')
+    ->fields('u')
+    ->condition('uid', $user->uid,'=')
+    ->execute()
+    ->fetchObject();
+    $current_menu_item = menu_get_item();
+    if ($current_menu_item['path'] == 'user/%/edit' && !empty($result)) {
+     $_GET['destination'] = $result->cur_path; //Redirect user to his current status page after account update.
+   }elseif($current_menu_item['path'] == 'user/%/edit' && empty($result) && !(bool)in_array('administrator', $user->roles)){
+     $_GET['destination'] = 'sps/user/register'; //if user ha no data in sps user reg table.
+   }
+}
+
+/**
+ * implimentation of hook_user_insert()
+ */
+function sps_register_user_insert(&$edit, $account) {
+  $nid = db_insert('sps_user_reg_status') 
+      ->fields(array(
+         'cur_path' => 'sps/user/register',
+         'uid' => $account->uid,
+         'ref_nid' => 0,
+         'accs_reg_link' =>0,
+    ))->execute();
+}
+
+/**
+ * implimentation of hook_FORM_ID_form_alter()
+ */
+function sps_register_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
+        
+       // drupal_set_message("<pre>".print_r($form,'true')."</pre>");
+        hide($form['field_sps_affiliation']);
+        hide($form['field_relationship']);
+        hide($form['field_name_if_not_self']);
+        hide($form['field_full_name']);
+        hide($form['field_preferred_name']);
+        hide($form['field_date_of_birth']);
+        hide($form['field_first_board_exam_year']);
+        hide($form['field_first_year_at_sps']);
+        hide($form['field_last_year_at_sps']);
+        hide($form['field_region_city']);
+        hide($form['field_gender']);
+        hide($form['field_mobile_phone']);
+        hide($form['field_terms_of_service']);
+        hide($form['field_emails_of_sps_people']);
+        hide($form['field_estimated_name_label']);
+        hide($form['field_order']);
+        hide($form['field_admission_no']);
+        hide($form['field_validation_request']);
+        hide($form['field_admission_dt']);
+        hide($form['field_f_and_m_name']);
+        hide($form['field_last_name']);
+        hide($form['field_date_of_withdrawal']);
+        hide($form['field_image_no']);
+        hide($form['field_fandl_name_only']);
+        hide($form['field_est_board_exam']);
+        hide($form['field_unique']);
+        hide($form['field_mailing_address']);
+}
+
+/**
+ * implimentation of hook_mail()
+ */
+function sps_register_mail($key, &$message, $params) {
+  $language = $message['language'];
+  switch ($key) {
+    case 'validate': //switching on $key lets you create variations of the email based on the $key parameter
+      $message['subject'] = $params['subject'];
+      $message['body'][] = $params['body'];//the email body is here, inside the $message array
+      break;
+  }
+}
+
+/**
+ * implimentation of hook_profile2_presave()
+ */
+function sps_register_profile2_presave($profile) {
+db_update('sps_user_reg_status')->fields(array('cur_path' => 'user'))->condition('uid', $profile->uid,'=')->execute();
+drupal_set_message("Information saved");
+drupal_goto();
+}
+
+/**
+ * implimentation of hook_FORM_ID_form_alter()
+ */
+function sps_register_form_profile2_form_alter(&$form, &$form_state) {
+  // Your alterations.
+	drupal_set_title("Additional Details");
+	$form['success-desc'] = array(
+    '#markup' => 'Please complete the following so we have complete records. Fields are mandatory unless specified otherwise. We need to make sure your information is up-to-date, so we will display it every 6 months when you log in.',
+    '#weight'=> -10
+    );
+    $form['profile_additional_details']['field_primary_phone']['und'][0]['value']['#attributes']['placeholder']  = t('+919434888888');
+    $form['profile_additional_details']['field_secondary_phone']['und'][0]['value']['#attributes']['placeholder']  = t('+91');
+    $form['profile_additional_details']['field_position']['und'][0]['value']['#attributes']['placeholder']  = t('Account Executive');
+    $form['profile_additional_details']['field_organization']['und'][0]['value']['#attributes']['placeholder']  = t('Infosys');
+    $form['profile_additional_details']['field_secondary_email']['und'][0]['value']['#attributes']['placeholder']  = t('secondemail@yahoo.com');
+	$form['actions'] = array('#type' => 'actions');
+    $form['actions']['submit'] = array('#type' => 'submit','#value' => t('Finish'));
+}

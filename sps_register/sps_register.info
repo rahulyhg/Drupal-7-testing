@@ -1,0 +1,6 @@
+name = SPS Registration 
+description = Register user at Sps with avilable options.
+core = 7.x
+package = custom
+version =7.0
+
