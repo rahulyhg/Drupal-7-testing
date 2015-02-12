@@ -1,4 +1,0 @@
-name = My Content type
-description = "A custom content type that a user can add and use it"
-core = 7.x
-package = My Content type
