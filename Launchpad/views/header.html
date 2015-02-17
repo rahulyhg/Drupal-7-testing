@@ -1,0 +1,22 @@
+      <div id="header" class="clearfix"><div class="container"><div class="container-inner">
+        <div class="top-links">
+          <div ng-if="!currentUser">
+            <ul class="menu">
+              <li><a href="#/users/signup" class="create-account first">Create Account</a></li>
+              <li><a href="#/users/login" class="login last">Login</a></li>
+            </ul>
+          </div>
+  	      <div ng-if="currentUser">
+  	        <ul class="menu">
+  		      <li><a href="#/profile" class="profile-of first">Profile of {{profile.field_first_name}}</a></li>
+  		      <li><a href="#/logout" class="logout">Log Out</a></li>
+  	        </ul>
+          </div>
+        </div>
+	    <div class="logo-area">
+	      <a href="#/" class="logo"><img src="img/logo.png" alt="Imtrade" /></a>
+	      <div id="site-name">
+	        <a href="#/">Enterpreneurship Centre</a>
+          </div>
+	    </div>
+      </div></div></div><!--- end /.container-inner, /.container, /#header --->

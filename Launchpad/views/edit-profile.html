@@ -1,0 +1,62 @@
+<div id="user-register-container">
+<a href="" id="idTop"></a>
+ <h2 class="title">Edit Profile</h2>
+   <div class="notificationmsg error" ng-if="errormsg">{{errormsg}}</div>
+   <div class="notificationmsg success" ng-if="successmsg">{{successmsg}}</div>
+     <div class="loadingBar" ng-if="loading"></div> 
+	<form name="editProfile" ng-submit="updateUserProfile(editProfile)" novalidate>
+      <div class="user-register">
+      
+        <div class="form-item form-type-textfield">
+          <label>First Name *</label>          
+          <input tabindex="1" id="edit-first-name" class="form-text" type="text" name="firstname" ng-model="updatePF.field_first_name" required>
+        </div>
+        
+        <div class="form-item form-type-textfield">
+          <label>Last Name *</label>          
+          <input tabindex="1" id="edit-last-name" class="form-text" type="text" name="lastname" ng-model="updatePF.field_last_name" required>
+        </div>
+        
+        <div class="form-item form-type-checkbox">
+          <label>Show in Directory</label>
+          <input tabindex="1" id="edit-remember-me" class="form-checkbox" type="checkbox" ng-model="updatePF.field_want_to_appear_in_director" ng-true-value="'1'"/>
+        </div>
+
+        <div class="form-item form-type-textfield">
+          <label>Organisation</label>          
+          <input tabindex="1" id="edit-last-name" class="form-text" type="text" name="organisation" ng-model="updatePF.field_organisation">
+        </div>
+        
+        <div class="form-item form-type-textfield">
+          <label>Website URL</label>          
+          <input tabindex="1" id="edit-last-name" class="form-text" type="text" name="websiteURL" ng-model="updatePF.field_website_1">
+        </div>
+
+        <div class="form-item form-type-textfield">
+          <label>LinkedIn URL</label>          
+          <input tabindex="1" id="edit-last-name" class="form-text" type="text" name="linkedURL" ng-model="updatePF.field_linkedin">
+        </div>
+
+        <div class="form-item form-type-textfield">
+          <label>Interested in</label>          
+          <select tabindex="1" id="edit-last-name" class="form-text" name="interestedIn" ng-options="item.label for item in topics track by item.id" ng-model="editUser.field_i_m_interested_in">
+          </select>
+        </div>
+
+        <div class="form-item form-type-textfield">
+          <label>Experienced In</label>          
+          <select tabindex="1" id="edit-last-name" class="form-text" name="experiencedIn" ng-options="item.label for item in topics track by item.id" ng-model="editUser.field_ask_me_about">
+          </select>
+        </div>
+
+        <div class="form-item form-type-textfield">
+          <label>Twitter handle</label>          
+          <input tabindex="1" id="edit-last-name" class="form-text" type="text" name="twitter_handle" ng-model="updatePF.field_twitter.twitter_username" placeholder="Twitter user name ">
+        </div>
+
+        <div class="form-item form-type-submit">
+        <input tabindex="1" id="edit-submit" class="form-submit" value="Update" type="submit" />
+        </div>
+    </div><!-- end /.user-register -->
+  </form>
+</div><!-- end /#user-register-container -->

@@ -1,0 +1,24 @@
+<div id="user-register-container">
+	<h2 class="title">Contact </h2>
+	<div class="loadingBar" ng-if="loading"></div>
+	<div class="notificationmsg error" ng-if="errormsg">{{errormsg}}</div>
+      <div class="notificationmsg success" ng-if="successmsg">{{successmsg}}</div>
+      <div class="loadingBar" ng-if="loading1"></div>
+	<form name="contactForm" ng-submit="sendMail(contactForm)" novalidate>
+		<div class="user-register">
+			<div class="form-item form-type-textfield">
+				<label>To</label>
+				<input tabindex="1" id="edit-email" class="form-text" type="text" name="mailTo" ng-model="mailData.mailTo" required/>
+			</div>
+
+			<div class="form-item form-type-textfield">
+				<label>Message</label>
+				<textarea tabindex="1" id="edit-email" class="form-text" rows="5" cols="30" name="mailBody" ng-model="mailData.message" required></textarea>
+			</div>
+
+			<div class="form-item form-type-submit">
+				<input tabindex="1" class="form-submit" id="edit-submit" type="submit" value="Send"/>
+			</div>
+		</div>
+	</form>
+</div>

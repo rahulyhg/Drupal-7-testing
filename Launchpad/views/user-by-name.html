@@ -1,0 +1,26 @@
+<div ng-include src="'views/description.html'"></div>
+  <div class="loadingBar" ng-if="loading"></div>
+  <div class="search-by-alphabet">
+    <a href="#/{{char.value}}"  ng-repeat="char in characters">
+    {{char.label}}
+    </a>
+  </div>
+  <div class="users-list-container">
+  	<h2 class="index">{{filterVal}}</h2>
+  	<ul class="users-list">
+  		<li ng-if="isUserFound(filterVal)">
+  			<div>No matching users at present </div>
+  		</li>
+        <li ng-repeat = "user in allUsers | UsrCat:filterVal">
+	        <div ng-if="user">
+	          <span ng-if="user.field_website_profile_photo"><img class="avatar" ng-src="http://launchpad.gocatalyze.com/sites/launchpad.gocatalyze.com/files/styles/thumbnail/public/{{user.field_website_profile_photo.filename}}"/></span>
+	          <span ng-if="!user.field_website_profile_photo"><img class="avatar" ng-src="img/default-user.jpg"></span>
+
+	          <div class="info">
+	            <div class="user-name"><a href="#/user/{{user.pid}}">{{user.label}}</a></div>
+	            <div class="user-email">{{user.field_organisation}}</div>
+	          </div>
+	         </div>
+	    </li>
+      </ul>
+  </div>
