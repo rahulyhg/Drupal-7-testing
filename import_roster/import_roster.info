@@ -1,0 +1,5 @@
+name = Roster Importer
+package = custom
+description = Create Roster entity using import roster.
+core = 7.x
+

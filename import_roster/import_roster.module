@@ -1,0 +1,184 @@
+<?php 
+/**
+ * Implements hook_menu()
+ */
+function import_roster_menu() {
+  $items['admin/config/user-interface/import-roster'] = array(
+    'title' => 'Import Roster',
+    'description' => 'Import roster csv file',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('import_roster_csv_form'),
+    'access arguments' => array('administer users'),
+  );
+
+  return $items;
+}
+
+/***********************************import csv file form function start**********************************/
+function import_roster_csv_form($form, $form_state) {
+  $form['note'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Instruction before Uploding Roster'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+   $form['note']['notes'] = array(
+    '#type' => 'markup',
+    '#markup' => '<div class="import-notes">A few notes when uploading. <ul><li>Make sure the file is in a .csv format.</li><li>Columns should be in *,* order</li></ul></div>',
+  );
+  $form['import-file'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Import Roster CSV'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['import-file']['import'] = array(
+    '#title' => t('Import'),
+    '#type' => 'managed_file',
+    '#description' => t('The uploaded csv will be imported and temporarily saved.'),
+    '#upload_location' => 'public://tmp/',
+    '#upload_validators' => array(
+      'file_validate_extensions' => array('csv'),
+    ),
+  );
+  #file upload button for midsize company
+  $form['import-file']['submit'] = array (
+    '#type' => 'submit',
+    '#value' => t('Import Roster File'),
+    '#submit' => array('import_roster_csv_submit'),
+  );
+  return $form;
+}
+/**
+ * Submit handler
+ */
+function import_roster_csv_submit($form, $form_state) {
+  if(isset($form_state['values']['import'])) {
+    $file_data = file_load($form_state['values']['import']);
+    $uri       = $file_data->uri;
+
+    if(file_exists(drupal_realpath($uri))) { 
+      $handle = fopen(drupal_realpath($uri), "r");
+      $header = null; 
+      while(($data = fgetcsv($handle, 0, ',', '"')) !== FALSE) {
+        if($header === null) {
+          $header = $data;
+          continue;
+        }
+        else {
+          $all_rows = array_combine($header, $data);
+          $operations[] = array(
+            '_import_roster_batch_processing',  // The function to run on each row
+            array($all_rows),  // The row in the csv
+          );
+        }
+      }
+
+      $batch = array(
+        'title' => t('Importing CSV...'),
+        'operations' => $operations,  // Runs all of the queued processes from the while loop above.
+        'finished' => '_import_roster_finished', // Function to run when the import is successful
+        'error_message' => t('The installation has encountered an error.'),
+        'progress_message' => t('Imported @current of @total products.'),
+      ); 
+      batch_set($batch);
+      fclose($handle);   
+    }
+  }
+  else {
+    drupal_set_message(t('There was an error uploading your file. Please contact a System administator.'), 'error');
+  }
+}
+
+function _import_roster_batch_processing($data) {
+  $roster_title            = "Roster_".protect_multibyte($data['Order']);
+  $roster_order            = protect_multibyte($data['Order']);
+  $roster_adm_No           = protect_multibyte($data['Admission No']);
+  $roster_adm_date         = protect_multibyte($data['Admission Dt']);
+  $roster_fn_mn            = protect_multibyte($data['F&M Names']);
+  $roster_ln               = protect_multibyte($data['Last Name']);
+  $roster_dob              = protect_multibyte($data['Date of Birth']);
+  $roster_dow              = protect_multibyte($data['Date of Withdrawal']);
+  $roster_img_no           = protect_multibyte($data['Image_No']);
+  $roster_fl_name          = protect_multibyte($data['F&L Name Only']);
+  $roster_byr              = protect_multibyte($data['B-Yr']);
+  $roster_bday             = protect_multibyte($data['B-Day']);
+  $roster_bmth             = protect_multibyte($data['B-Mth']);
+  $roster_ayr              = protect_multibyte($data['A-Yr']);
+  $roster_aday             = protect_multibyte($data['A-Day']);
+  $roster_amth             = protect_multibyte($data['A-Mth']);
+  $roster_wyr              = protect_multibyte($data['W-Yr']);
+  $roster_wday             = protect_multibyte($data['W-Day']);
+  $roster_wmth             = protect_multibyte($data['W-Mth']);
+  $roster_bdate            = protect_multibyte($data['B-Date']);
+  $roster_adate            = protect_multibyte($data['A-Date']);
+  $roster_wdate            = protect_multibyte($data['W-Date']);
+  $roster_stay             = protect_multibyte($data['Stay']);
+  $roster_rough_yr         = protect_multibyte($data['Rough Yr']);
+  $roster_est_yr           = protect_multibyte($data['Est Yr']);
+  $roster_est_name         = protect_multibyte($data['Est Name Label']);
+  $roster_est_board        = protect_multibyte($data['Est Board Exam(s)']);
+  $roster_uniques          = protect_multibyte($data['Uniques']);
+
+  $query = new EntityFieldQuery();
+  $entities = $query->entityCondition('entity_type', 'node')
+  ->propertyCondition('type', 'roster')
+  ->propertyCondition('title', $roster_title)
+  ->propertyCondition('status', 1)
+  ->range(0,1)
+  ->execute();
+
+  if (empty($entities['node'])) {
+    global $user;
+    $node = new stdClass();
+    $node->title = $roster_title;
+    $node->type = "roster";
+    node_object_prepare($node); 
+    $node->language = LANGUAGE_NONE;
+    $node->uid = $user->uid; 
+    $node->status = 1;
+    $node->field_roster_order[$node->language][0]['value']              = $roster_order;
+    $node->field_roster_admission_no[$node->language][0]['value']       = $roster_adm_No;
+    $node->field_roster_admission_dt[$node->language][0]['value']       = $roster_adm_date;
+    $node->field_roster_f_m_names[$node->language][0]['value']          = $roster_fn_mn ;
+    $node->field_roster_last_name[$node->language][0]['value']          = $roster_ln;
+    $node->field_roster_date_of_birth[$node->language][0]['value']      = $roster_dob;
+    $node->field_roster_date_of_withdrawal[$node->language][0]['value'] = $roster_dow;
+    $node->field_roster_image_no[$node->language][0]['value']           = $roster_img_no;
+    $node->field_roster_f_l_name_only[$node->language][0]['value']      = $roster_fl_name;
+    $node->field_roster_b_yr[$node->language][0]['value']               = $roster_byr;
+    $node->field_roster_b_day[$node->language][0]['value']              = $roster_bday;
+    $node->field_roster_b_mth[$node->language][0]['value']              = $roster_bmth;
+    $node->field_roster_a_yr[$node->language][0]['value']               = $roster_ayr;
+    $node->field_roster_a_day[$node->language][0]['value']              = $roster_aday;
+    $node->field_roster_a_mth[$node->language][0]['value']              = $roster_amth;
+    $node->field_roster_w_yr[$node->language][0]['value']               = $roster_wyr;
+    $node->field_roster_w_day[$node->language][0]['value']              = $roster_wday;
+    $node->field_roster_w_mth[$node->language][0]['value']              = $roster_wmth;
+    $node->field_roster_b_date[$node->language][0]['value']             = $roster_bdate;
+    $node->field_roster_a_date[$node->language][0]['value']             = $roster_adate;
+    $node->field_roster_w_date[$node->language][0]['value']             = $roster_wdate;
+    $node->field_roster_stay[$node->language][0]['value']               = $roster_stay;
+    $node->field_roster_rough_yr[$node->language][0]['value']           = $roster_rough_yr;
+    $node->field_roster_est_yr[$node->language][0]['value']             = $roster_est_yr;
+    $node->field_roster_est_name_label[$node->language][0]['value']     = $roster_est_name;
+    $node->field_roster_est_board_exam_s_[$node->language][0]['value']  = $roster_est_board;
+    $node->field_roster_uniques[$node->language][0]['value']            = $roster_uniques;
+
+    $node = node_submit($node); // Prepare node for saving
+    node_save($node);
+  }
+  else {
+    drupal_set_message(t('Already created rosters.'), 'status');
+  }
+}
+
+
+function protect_multibyte($inputStr) {
+  return mb_convert_encoding($inputStr, 'UTF-8');
+}
+
+function _import_roster_finished() {
+  drupal_set_message(t('Roster successfully imported'));
+}
+

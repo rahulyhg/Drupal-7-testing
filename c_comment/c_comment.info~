@@ -1,8 +1,0 @@
-name = Costum comment
-description = "Allows users to comment nodes. that will be seen by specific user"
-core = 7.x
-files[] = c_comment.module
-files[] = c_comment.install
-files[] = c_comment.admin.inc
-configure=admin/config/content/c_comment/settings
-package = costum comment

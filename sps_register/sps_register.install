@@ -1,0 +1,105 @@
+<?php 
+/**
+ * @file
+ * Database Installation
+ * 
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+ function sps_register_schema() {
+
+  $schema['sps_user_reg_status'] = array(
+    'description' => 'User registration page status.',
+    'fields' => array(
+       'id' => array(
+         'description' => 'The primary identifier.',
+         'type' => 'serial',
+         'unsigned' => TRUE,
+         'not null' => TRUE
+       ),
+       'uid' => array(
+         'description' => 'SPS register user id',
+         'type' => 'int',
+         'not null' => TRUE
+       ),
+       'cur_path' => array(
+         'description' => 'Current active path of default login',
+         'type' => 'varchar',
+         'length' => '255',
+         'default' => ''
+       ),
+       'ref_nid' => array(
+         'description' => 'Reference node id of user roaster',
+         'type' => 'int',
+         'not null' => TRUE
+       ),
+       'accs_reg_link' => array(
+         'description' => 'Has user visited sps registration',
+         'type' => 'int',
+         'not null' => TRUE
+       ),
+    ),
+    'primary key' => array('id'),
+  );
+
+  $schema['sps_user_invitation'] = array(
+    'description' => 'User invitation status.',
+    'fields' => array(
+       'id' => array(
+         'description' => 'The primary identifier.',
+         'type' => 'serial',
+         'unsigned' => TRUE,
+         'not null' => TRUE
+       ),
+       'uid' => array(
+         'description' => 'Inviter id',
+         'type' => 'int',
+         'not null' => TRUE
+       ),
+       'invitee_mail' => array(
+         'description' => 'Invitee email address',
+         'type' => 'varchar',
+         'length' => '255',
+         'default' => ''
+       ),
+       'invitee_tok' => array(
+         'description' => 'Invitee invitaion token',
+         'type' => 'varchar',
+         'length' => '255',
+         'default' => ''
+       ),
+       'invitee_status' => array(
+         'description' => 'Satus of invitee',
+         'type' => 'int',
+         'size' => 'tiny',
+         'default' => 0
+       ),
+       'inviter_approval' => array(
+         'description' => 'Status of inviter approval',
+         'type' => 'int',
+         'size' => 'tiny',
+         'default' => 0
+       )
+    ),
+    'primary key' => array('id'),
+  );
+  
+  return $schema;
+ }
+
+/**
+ * Implementation of hook_install().
+ */
+ function sps_register_install() {
+   
+ }
+
+ /**
+ * Implementation of hook_uninstall().
+ */
+ function sps_register_uninstall() {
+   
+ }
+ 
