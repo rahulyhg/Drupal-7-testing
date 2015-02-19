@@ -1,0 +1,29 @@
+<div id="container" scroll-to="">
+  <h1 class="work-diary">Work Diary</h1>
+  <ul class="diary-notes">
+    <div class="loadingBar" ng-if="loadingBar1"><img src="img/icon/loadingBar.gif"></div>
+    <li ng-repeat="history in histories">
+      <p class="date">{{history.field_work_diary_date | datetime:'dd MMM yyyy' }}</p>
+
+      <p ng-if="history.field_work_diary_entry == 1">You applied for a job, {{history.field_job_title}} at
+        {{history.field_employer}}.</p>
+
+      <p ng-if="history.field_work_diary_entry == 2">You scheduled an interview at {{history.field_interview_date_time |
+        datetime:'hh:mm a EEEE dd MMMM yyyy' }} for {{history.field_job_title}} at {{history.field_employer}}.</p>
+
+      <p ng-if="history.field_work_diary_entry == 3">You completed a training course, {{history.field_course_title}}, at
+        {{history.field_training_provider}}.</p>
+
+      <p ng-if="history.field_work_diary_entry == 4">You worked for {{history.field_hours}} hours at
+        {{history.field_employer}}.</p>
+
+      <p ng-if="history.field_work_diary_entry == 5">You declared wages of {{history.field_wages}} from your work at
+        {{history.field_employer}}.</p>
+
+      <p>{{history.field_notes}}</p>
+    </li>
+
+  </ul>
+  <div class="clear clearfix"></div>
+</div>
+

@@ -1,18 +1,17 @@
   <div ng-include src="'views/description.html'"></div>
   <div class="loadingBar" ng-if="loading"></div> 
   <div class="directory-list">
-    <div class="directory-header" ng-repeat="term in topics">
-      <label ng-if="toSetLabel(term.id)"><a href="#/tags/{{term.id}}">{{term.label}}</a></label>
+    <div class="directory-header" ng-repeat="term in cate">
+      <label><a href="#/tags/{{term.ids}}">{{term.label}}</a></label>
       <ul class="users-list">
-        <li ng-repeat="user in getCategoryUserByExperience(term.id)">
-           <a ng-if="user.photo" href="#/user/{{user.pid}}" title="{{user.label}}">
-              <img class="avatar" ng-src="http://launchpad.gocatalyze.com/sites/launchpad.gocatalyze.com/files/{{user.photo}}"/>
+        <li ng-repeat="user in term.users">
+           <a ng-if="user.field_website_profile_photo" href="#/user/{{user.pid}}" title="{{user.label}}">
+              <img class="avatar" ng-src="http://launchpad.gocatalyze.com/sites/launchpad.gocatalyze.com/files/{{user.field_website_profile_photo.filename}}"/>
            </a>
-           <a ng-if="!user.photo" href="#/user/{{user.pid}}" title="{{user.label}}">
+           <a ng-if="!user.field_website_profile_photo" href="#/user/{{user.pid}}" title="{{user.label}}">
               <img class="avatar" ng-src="img/default-user.jpg" src="img/default-user.jpg"/>
            </a>
         </li>
       </ul>
     </div> 
   </div>
-  

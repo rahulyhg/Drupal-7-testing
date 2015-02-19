@@ -16,7 +16,11 @@ launchpad.controller("MainController",function($scope,$location,$rootScope,$wind
 	
 	$scope.loading = '';
 	
-
+    $scope.getAnim = function(){
+		if(checkPathForAnim($location.path()))
+			return;
+		return 'view-slide-in';
+	}
 	// get all users
 	$rootScope.allUsers = {};
 	$rootScope.allUsers = ListUsers.query();
@@ -26,14 +30,20 @@ launchpad.controller("MainController",function($scope,$location,$rootScope,$wind
 	$rootScope.topics = Topics.query();
 
 	//setting topic label
+    //used this array to form select list for field im intrested in , experienced in.
+	$scope.vocabTag = [
+      {label: "- None -", value: "0"},
+      {label: "Education", value: "1"},
+      {label: "Business", value: "2"},
+      {label: "Investment", value: "3"}
+    ];
 
 	$scope.toSetLabel = function(id){
 		var flag = 0;
 		for(var i=0;i<$rootScope.allUsers.length;i++){
 			if($rootScope.allUsers[i].field_ask_me_about){
 				if($rootScope.allUsers[i].field_ask_me_about.target_id == id){
-					flag = 1;
-					
+					flag = 1;	
 				}
 			}
 		}
@@ -48,6 +58,7 @@ launchpad.controller("MainController",function($scope,$location,$rootScope,$wind
 
 	$scope.getCategoryUserByExperience = function(tid){
 		$scope.categoryUserByExperience = [];
+		$scope.categoryUserByExperience.length = 0;
 		for(var i=0;i<$rootScope.allUsers.length;i++){
 			if($rootScope.allUsers[i].field_ask_me_about){
 				if($rootScope.allUsers[i].field_ask_me_about.target_id == tid){
@@ -58,6 +69,7 @@ launchpad.controller("MainController",function($scope,$location,$rootScope,$wind
 				}
 			}
 		}
+		
 		return $scope.categoryUserByExperience;
 	};
 	
@@ -66,6 +78,7 @@ launchpad.controller("MainController",function($scope,$location,$rootScope,$wind
 
 	$scope.getCategoryUserByInterest = function(tid){
 		$scope.categoryUserByInterest = [];
+		$scope.categoryUserByInterest.length = 0;
 		for(var i=0;i<$rootScope.allUsers.length;i++){
 			if($rootScope.allUsers[i].field_i_m_interested_in){
 				if($rootScope.allUsers[i].field_i_m_interested_in.target_id == tid){
@@ -202,11 +215,13 @@ launchpad.controller("MainController",function($scope,$location,$rootScope,$wind
 		if(id == 1){
 			$scope.NameClass = 'active';
 			$scope.exClass = '';
+			return $scope.NameClass;
 		} else if(id == 2){
 			$scope.exClass = 'active';	
 			$scope.NameClass = '';
+			return $scope.exClass;
 		}
-		return;
+		
 	};
 
 
@@ -245,6 +260,7 @@ launchpad.controller("HomeController",function($scope,$rootScope,ListUsers,$loca
 		$scope.loading = false;	
 		//fbloader_stop();
 	});
+
 	
 
 });
@@ -252,13 +268,37 @@ launchpad.controller("HomeController",function($scope,$rootScope,ListUsers,$loca
 launchpad.controller("ExpController",function($scope,$rootScope,ListUsers){
 	$scope.setActiveClass(2);
 	$scope.loading = true;
-	//fbloader_start();
+	
 	$rootScope.allUsers = ListUsers.query();
 	$rootScope.allUsers.$promise.then(function(){
+		$scope.groupBy();
 		$scope.loading = false;
-		//fbloader_stop();
 	});
-	
+
+    //Group all user by category ids	
+	$scope.groupBy = function(){
+		$scope.cate = [];
+		for(var j=0;j<$rootScope.topics.length;j++){
+			var flag = $scope.toSetLabel($rootScope.topics[j].id);
+			if(flag){
+				$scope.cate.push({label:$rootScope.topics[j].label,
+					ids : $rootScope.topics[j].id,
+					users:[]
+					});
+			}
+		}
+		
+		for(var i=0;i<$scope.cate.length;i++){
+			var group = $scope.cate[i]; 
+		    for(var j=0;j<$rootScope.allUsers.length;j++){
+				if($rootScope.allUsers[j].field_ask_me_about){
+					if($rootScope.allUsers[j].field_ask_me_about.target_id == $scope.cate[i].ids){
+						$scope.cate[i].users.push($rootScope.allUsers[j]);
+					}
+				}
+			}
+		}
+	}
 	
 });
 

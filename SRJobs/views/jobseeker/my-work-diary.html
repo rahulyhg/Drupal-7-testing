@@ -1,0 +1,210 @@
+<div id="container-main" scroll-to="">
+  <h1 class="work-diary">Work Diary</h1>
+  <ul class="job">
+    <li ng-click="toggleModelJobApp(1)"><a class="new-job">Add New Job Application</a></li>
+    <li ng-click="toggleModelJobApp(2)"><a class="job-interview">Add New Interview</a></li>
+    <li ng-click="toggleModelJobApp(3)"><a class="job-course">Add Study or Course</a></li>
+  </ul>
+  <ul class="hours">
+    <li ng-click="toggleModelJobApp(4)"><a class="add-hour">Add Your Hours</a></li>
+    <li ng-click="toggleModelJobApp(5)"><a class="add-wages">Add Your Wages</a></li>
+  </ul>
+  <ul class="history-help">
+    <li ng-click="locationRedirect('myWorkHistory')"><a href="#/myWorkHistory" class="history">Work Diary History</a>
+    </li>
+  </ul>
+  <div class="clear clearfix"></div>
+
+</div>
+
+<section class="semantic-content  semantic-content2 workdiaryModel" id="modal-text" tabindex="-1" ng-if="toggleState">
+  <div class="modal-inner" id="modal-inner">
+    <div class="model-close-img" ng-click="toggleModelJobApp('')"></div>
+    <div class="modal-content" id="popup">
+      <h1 ng-if="workDiaryPopupFlag ==1">Add New Job Application</h1>
+
+      <h1 ng-if="workDiaryPopupFlag ==2">Add New Interview</h1>
+
+      <h1 ng-if="workDiaryPopupFlag ==3">Add Study or Course</h1>
+
+      <h1 ng-if="workDiaryPopupFlag ==4">Add Your Hours</h1>
+
+      <h1 ng-if="workDiaryPopupFlag ==5">Add Your Wages</h1>
+      <br/>
+
+      <div class="loadingBar" ng-if="loadingBar1"><img src="img/icon/loadingBar.gif"></div>
+      <div class="scroll-model">
+        <div id="topOfForm"></div>
+        <form name="jobForm" ng-submit="saveApplication()" handle-phone-submit>
+          <ul class="diary-notes">
+            <li ng-if="error_msgs.length>0">
+              <span class="error" ng-repeat="error_msg in error_msgs">{{$index+1}}. {{error_msg}}</span></br>
+            </li>
+            <li ng-if="workDiaryPopupFlag != 3">
+              <p class="date">Employer Name</p>
+              <input type="text" id="txt-field4" class="textfield" name="field_employer"
+                     ng-model="jobApp.field_employer" placeholder="Tap to add">
+            </li>
+            <li ng-if="workDiaryPopupFlag != 3">
+              <p class="date">Job Title</p>
+              <input type="text" id="txt-field4" class="textfield" name="field_job_title"
+                     ng-model="jobApp.field_job_title" placeholder="Tap to add">
+            </li>
+            <li ng-if="workDiaryPopupFlag == 3">
+              <p class="date">Course Title</p>
+              <input type="text" id="txt-field4" class="textfield" name="field_course_title"
+                     ng-model="jobApp.field_course_title" placeholder="Tap to add">
+            </li>
+            <li ng-if="workDiaryPopupFlag == 3">
+              <p class="date">Training Provider</p>
+              <input type="text" id="txt-field4" class="textfield" name="field_training_provider"
+                     ng-model="jobApp.field_training_provider" placeholder="Tap to add">
+            </li>
+            <li ng-if="workDiaryPopupFlag == 5">
+              <p class="date">Wages</p>
+              <input type="text" id="txt-field4" class="textfield" name="field_wages" ng-model="jobApp.field_wages"
+                     placeholder="Tap to add">
+            </li>
+            <li ng-if="workDiaryPopupFlag == 1">
+              <p class="date">Application Due Date</p>
+              <select class="select due_date_D" ng-model="due_date.day" ng-options="opt as opt.label for opt in days">
+              </select>
+              <select class="select due_date_M" ng-model="due_date.month"
+                      ng-options="opt as opt.label for opt in months">
+              </select>
+              <select class="select due_date_Y" ng-model="due_date.year" ng-options="opt as opt.label for opt in years">
+              </select>
+            </li>
+            <li ng-if="workDiaryPopupFlag == 2">
+              <p class="date">Interview Date</p>
+              <select class="select due_date_D" ng-model="interview_date.day"
+                      ng-options="opt as opt.label for opt in days">
+              </select>
+              <select class="select due_date_M" ng-model="interview_date.month"
+                      ng-options="opt as opt.label for opt in months">
+              </select>
+              <select class="select due_date_Y" ng-model="interview_date.year"
+                      ng-options="opt as opt.label for opt in years">
+              </select>
+            </li>
+            <li ng-if="workDiaryPopupFlag == 2">
+              <p class="date">Interview Time</p>
+              <select class="select due_date_D" ng-model="interview_date.hour"
+                      ng-options="opt as opt.label for opt in hours">
+              </select>
+              <select class="select due_date_M floatNone" ng-model="interview_date.minute"
+                      ng-options="opt as opt.label for opt in minutes">
+              </select>
+            </li>
+            <li ng-if="workDiaryPopupFlag == 3">
+              <p class="date">Training Date</p>
+              <select class="select due_date_D" ng-model="training_date.day"
+                      ng-options="opt as opt.label for opt in days">
+              </select>
+              <select class="select due_date_M" ng-model="training_date.month"
+                      ng-options="opt as opt.label for opt in months">
+              </select>
+              <select class="select due_date_Y" ng-model="training_date.year"
+                      ng-options="opt as opt.label for opt in years">
+              </select>
+            </li>
+            <li ng-if="workDiaryPopupFlag == 3">
+              <p class="date">Training Time</p>
+              <select class="select due_date_D" ng-model="training_date.hour"
+                      ng-options="opt as opt.label for opt in hours">
+              </select>
+              <select class="select due_date_M floatNone" ng-model="training_date.minute"
+                      ng-options="opt as opt.label for opt in minutes">
+              </select>
+            </li>
+            <li ng-if="workDiaryPopupFlag == 4">
+              <p class="date">Hours</p>
+              <select class="select due_date_D" ng-model="work_hour.hour"
+                      ng-options="opt as opt.label for opt in hours">
+              </select>
+              <select class="select due_date_M floatNone" ng-model="work_hour.minute"
+                      ng-options="opt as opt.label for opt in minutes">
+              </select>
+            </li>
+            <li ng-if="workDiaryPopupFlag == 4 || workDiaryPopupFlag == 5">
+              <p class="date">Work Date</p>
+              <select class="select due_date_D" ng-model="work_date.day" ng-options="opt as opt.label for opt in days">
+              </select>
+              <select class="select due_date_M" ng-model="work_date.month"
+                      ng-options="opt as opt.label for opt in months">
+              </select>
+              <select class="select due_date_Y" ng-model="work_date.year"
+                      ng-options="opt as opt.label for opt in years">
+              </select>
+            </li>
+            <li ng-if="workDiaryPopupFlag == 4 || workDiaryPopupFlag == 5">
+              <p class="date">Work Time</p>
+              <select class="select due_date_D" ng-model="work_date.hour"
+                      ng-options="opt as opt.label for opt in hours">
+              </select>
+              <select class="select due_date_M floatNone" ng-model="work_date.minute"
+                      ng-options="opt as opt.label for opt in minutes">
+              </select>
+            </li>
+            <li ng-if="workDiaryPopupFlag == 2 || workDiaryPopupFlag == 3">
+              <p class="date">Street</p>
+              <input type="text" id="txt-field4" class="textfield" name="thoroughfare"
+                     ng-model="jobApp.field_location.thoroughfare" placeholder="Tap to add">
+            </li>
+            <li ng-if="workDiaryPopupFlag == 2  || workDiaryPopupFlag == 3">
+              <p class="date">City</p>
+              <input type="text" id="txt-field4" class="textfield" name="locality"
+                     ng-model="jobApp.field_location.locality" placeholder="Tap to add">
+            </li>
+            <li ng-if="workDiaryPopupFlag == 2 || workDiaryPopupFlag == 3">
+              <p class="date">State</p>
+              <select class="select" ng-model="jobApp.field_location.administrative_area"
+                      ng-options="opt as opt.label for opt in states">
+              </select>
+            </li>
+            <li ng-if="workDiaryPopupFlag == 2 || workDiaryPopupFlag == 3">
+              <p class="date">Postcode</p>
+              <input type="text" id="txt-field4" class="textfield" name="postal_code"
+                     ng-model="jobApp.field_location.postal_code" placeholder="Tap to add">
+            </li>
+            <li ng-if="workDiaryPopupFlag == 2 || workDiaryPopupFlag == 3">
+              <p class="date">Country</p>
+              <select class="select" ng-model="country" ng-options="opt as opt.label for opt in countries">
+              </select>
+            </li>
+            <li ng-if="workDiaryPopupFlag == 1">
+              <p class="date">Status</p>
+              <select class="select" ng-model="jobApp.field_application_status">
+                <option value="0" select> Select Status</option>
+                <option value="1"> Incomplete</option>
+                <option value="2"> Complete</option>
+              </select>
+            </li>
+            <li ng-if="workDiaryPopupFlag == 3">
+              <p class="date">Course Status</p>
+              <select class="select" ng-model="jobApp.field_course_status">
+                <option value="0" select> Select Status</option>
+                <option value="1"> Incomplete</option>
+                <option value="2"> Complete</option>
+              </select>
+            </li>
+            <li>
+              <p class="date">Notes</p>
+              <textarea rows="3" cols="5" id="txt-area2" ng-model="jobApp.field_notes"
+                        placeholder="Tap to add"></textarea>
+            </li>
+          </ul>
+          <input type="submit" class="invisibleButton"/>
+        </form>
+        <div class="clear clearfix"></div>
+        <div class="profile-resume">
+          <p class="create-rol" ng-click="saveApplication()" scroll-to="topOfForm"><a>Save</a></p>
+
+          <div class="clear clearfix"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="" class="modal-close" title="Close this modal" ng-click="toggleModel()">×</a>
+</section>
+

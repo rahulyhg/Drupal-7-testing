@@ -38,14 +38,14 @@
         </div>
 
         <div class="form-item form-type-textfield">
-          <label>Interested in</label>          
-          <select tabindex="1" id="edit-last-name" class="form-text" name="interestedIn" ng-options="item.label for item in topics track by item.id" ng-model="editUser.field_i_m_interested_in">
+          <label>Interested In</label>          
+          <select tabindex="1" id="edit-last-name" class="form-text" name="interestedIn" ng-options="item.label for item in vocabTag track by item.value" multiple ng-model="editUser.field_i_m_interested_in">
           </select>
         </div>
 
         <div class="form-item form-type-textfield">
           <label>Experienced In</label>          
-          <select tabindex="1" id="edit-last-name" class="form-text" name="experiencedIn" ng-options="item.label for item in topics track by item.id" ng-model="editUser.field_ask_me_about">
+          <select tabindex="1" id="edit-last-name" class="form-text" name="experiencedIn" ng-options="item.label for item in vocabTag track by item.value" multiple ng-model="editUser.field_ask_me_about">
           </select>
         </div>
 

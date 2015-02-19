@@ -1,0 +1,24 @@
+<div id="container" scroll-to="">
+  <div class="notification"><h1>Notifications </h1>
+
+    <h2 class="order">{{notifications.length}}</h2>
+
+    <div class="clear clearfix"></div>
+  </div>
+  <div class="clear clearfix"></div>
+  <ul class="diary-notes">
+    <div class="loadingBar" ng-if="loadingBar1"><img src="img/icon/loadingBar.gif"></div>
+    <li ng-repeat="notification in notifications">
+      <p class="date">{{notification.field_date | datetime:'dd MMM yyyy' }}</p>
+
+      <p>{{notification.field_message}}</p>
+    </li>
+    <li class="view"><a href="#">View archived notifications</a>
+    </li>
+  </ul>
+  <div class="clear clearfix"></div>
+</div>
+<div class="clear clearfix"></div>
+<div id="footer">
+
+</div>

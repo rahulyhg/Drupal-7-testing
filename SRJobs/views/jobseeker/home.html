@@ -1,0 +1,25 @@
+<div id="container-main" scroll-to=""> 
+    <h1 class="facebook capitalize">Hi, {{users.profile.field_first_name}}</h1>
+    <h2 class="facebook-acc">{{welcome()}}! You have <strong>{{notifications.length}}</strong> new notifications and it has been <strong ng-repeat="updatedDay in updatedDays | limitTo : 1">{{timediff(updatedDay.field_work_diary_date)}}</strong> days since you last posted in your work diary. Remember to keep your work diary and profile up to date to maximise your job search chances!</h2>
+    
+    <p class="m-btm-200">&nbsp;</p>   
+        
+    <div class="clear clearfix"></div>
+</div>
+<ul class="home-one">
+  <li class="notifications" ng-click="locationRedirect('notification')"><a>Notifications</a><div class="numberCircle">{{notifications.length}}</div></li>
+  <li class="work-diary" ng-click="locationRedirect('myWorkDiary')"><a>Work Diary</a></li>
+  <li class="profile" ng-click="locationRedirect('profile')"><a>Your Profile</a></li>
+  <li class="upskill" ng-click="locationRedirect('upskill')"><a>Upskill</a></li>
+</ul> 
+<section class="semantic-content viewShortlistModel" id="modal-text" tabindex="-1" ng-if="firstTimeLogin">
+  <div class="modal-inner">
+    <div class="model-close-img" ng-click="firstLoginToggle()"></div> 
+    <div class="modal-content inner-overlay-height">
+        <div class="ur-name">  <div id="topOfForm"></div>
+          <div class="yellow-star"></div>
+		  <div class="single-line"><p class="role-title-popup capitalize">Welcome {{users.profile.field_first_name}}!</p></div>
+		  <p class="comp role-employer-popup capitalize" >Your are now successfully registered with SR Jobs </p></div>
+</div>
+</div>
+</section>

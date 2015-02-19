@@ -1,0 +1,62 @@
+<div id="login-container">
+    <h1 class="facebook">Welcome to SR Jobs</h1>
+    <h2 class="facebook-acc">Please create an account to get started.</h2>    	
+    <div class="loadingBar" ng-if="loadingBar"><img src="img/icon/loadingBar.gif"></div> 
+    
+	<form ng-submit="actionCF()" handle-phone-submit novalidate>
+      <ul class="login-cont">
+
+		<li ng-if="error_msgs.length>0">
+		<span class="error" ng-repeat="error_msg in error_msgs">{{$index+1}}. {{error_msg}}</span></br>
+		</li>
+        <li>
+        <p class="login-label">Register As </p>
+        <ul class="chk-box">
+          <li>
+            <input type="radio" ng-model="personel" value="1" name="some">
+            <label for="checkbox1">Job Seeker</label></li>
+          <li>
+            <input type="radio" ng-model="personel" value="2" name="some">
+            <label for="checkbox2">Employer</label></li>
+        </ul>
+        <div class="clear clearfix"></div>
+
+        <p class="login-label">First Name</p>
+        <div class="login-input">
+        <input type="text" name="first_name" id="txt-field2" class="textfield login-input" ng-model="register.data.profile.field_first_name"placeholder="Tap to enter First Name" value=""  >
+        <div class="clear clearfix"></div>
+        </div>
+        <p class="login-label">Last Name</p>
+        <div class="login-input">
+        <input type="text" name="last_name" id="txt-field2" class="textfield login-input" ng-model="register.data.profile.field_last_name"placeholder="Tap to enter Last Name" value=""  >
+        <div class="clear clearfix"></div>
+        </div> 
+        <p class="login-label">Email</p>
+        <div class="login-input">
+        <input type="text" name="email" id="txt-field2" class="textfield login-input" ng-model="register.email" placeholder="Tap to enter Email" value=""  >
+        <div class="clear clearfix"></div>
+        </div>
+        <p class="login-label">Password</p>
+        <div class="login-input">
+        <input type="password" name="pass" id="txt-field2" class="textfield login-input" ng-model="register.password"placeholder="Tap to enter Password" value=""  >
+        <div class="clear clearfix"></div>
+        </div>
+        <p class="login-label">Confirm Password</p>
+        <div class="login-input">
+        <input type="password" name="cpass" id="txt-field2" class="textfield login-input" ng-model="confirm_password"placeholder="Tap to enter Password" value=""  >
+        <div class="clear clearfix"></div>
+        </div> 
+        <div class="clear clearfix"></div> </br>
+        <div class="clear clearfix"></div>
+        </li>
+      </ul>
+      <input type="submit" class="invisibleButton"/> 
+    </form>
+
+    <p class="m-btm-100">&nbsp;</p>   
+        
+    <div class="clear clearfix"></div>
+</div>
+<ul class="login-tab">
+  <li class="login" ng-click="actionCF()" scroll-to=""><a>Create Profile</a></li> 
+</ul> 

@@ -33,7 +33,7 @@
       <div ng-include src="'views/header.html'"></div>
 
       <div id="main" class="clearfix"><div class="container"><div class="container-inner">
-        <div ng-view class="view-slide-in"></div>
+        <div ng-view class="{{getAnim()}}"></div>
       </div></div></div><!--- end /.container-inner, /.container, /#main -->
 
       <div ng-include src="'views/footer.html'"></div>

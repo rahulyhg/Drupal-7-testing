@@ -1,0 +1,199 @@
+<div scroll-to=""></div>
+<div id="topOfForm" style="position:absolute;top:0;"></div>
+<div id="container">
+  <h1 class="your-profile">Edit Profile</h1>
+
+  <div class="loadingBar" ng-if="loadingBar1"><img src="img/icon/loadingBar.gif"></div>
+  <div class="profile-user profile-label">
+    <h1 class="uppercase">{{users.profile.field_first_name | cut:true:1:''}}{{users.profile.field_last_name |
+      cut:true:1:''}}</h1>
+    <h4 class="map-tit" ng-click="toggleName()"><a>TAP TO EDIT</a></h4>
+
+    <div class="edit-name">
+      <h2 class="capitalize">{{users.profile.field_first_name}} {{users.profile.field_last_name}}</h2>
+    </div>
+    <div class="clear clearfix"></div>
+  </div>
+  <form ng-submit="updateProfile();" handle-phone-submit>
+    <ul class="diary-notes">
+      <li ng-if="error_msgs.length>0">
+        <span class="error" ng-repeat="error_msg in error_msgs">{{$index+1}}. {{error_msg}}</span></br>
+      </li>
+
+      <li ng-if="showNameEdit">
+        <div class="phone">
+          <p>First Name </p>
+          <input type="text" id="txt-field2" class="textfield" placeholder="Tap to add"
+                 ng-model="editPF.field_first_name">
+
+          <div class="clear clearfix"></div>
+        </div>
+        <div class="phone">
+          <p>Last Name </p>
+          <input type="text" id="txt-field2" class="textfield" placeholder="Tap to add"
+                 ng-model="editPF.field_last_name">
+
+          <div class="clear clearfix"></div>
+        </div>
+      </li>
+      <li ng-if="!userHasRole ">
+        <p class="date">Jobseeker Status</p>
+        <select class="select" ng-model="filterCondition.field_status"
+                ng-options="opt as opt.label for opt in employments">
+        </select>
+      </li>
+
+       <li ng-if="userHasRole">
+        <p class="date">Organisation</p>
+        <select class="select" ng-model="filterCondition.field_organisation1"
+                ng-options="opt as opt.field_organisation_name for opt in organisation">
+        </select>
+      </li>
+
+      <li class="edit-map">
+        <iframe lat="{{editPF.field_geo.lat}}" lon="{{editPF.field_geo.lon}}" iframe-src ng-if="locationState"></iframe>
+        <h4 class="map-tit" ng-click="toggleLocation()"><a>TAP TO EDIT</a></h4>
+      </li>
+      <li ng-if="showLocationEdit">
+        <p class="date">Address</p>
+
+        <div class="phone">
+          <p>Country </p>
+          <select class="select profile-select" ng-model="country"
+                  ng-options="opt as opt.label for opt in countries"></select>
+        </div>
+        <div class="phone">
+          <p>State </p>
+          <input type="text" id="txt-field2" class="textfield" placeholder="Tap to add"
+                 ng-model="editPF.field_address.administrative_area">
+
+          <div class="clear clearfix"></div>
+        </div>
+        <div class="phone">
+          <p>City/Suburb </p>
+          <input type="text" id="txt-field2" class="textfield" placeholder="Tap to add"
+                 ng-model="editPF.field_address.locality">
+
+          <div class="clear clearfix"></div>
+        </div>
+        <div class="phone">
+          <p>Postcode </p>
+          <input type="text" id="txt-field2" class="textfield" placeholder="Tap to add"
+                 ng-model="editPF.field_address.postal_code">
+
+          <div class="clear clearfix"></div>
+        </div>
+        <div class="phone">
+          <p>Street </p>
+          <input type="text" id="txt-field2" class="textfield" placeholder="Tap to add"
+                 ng-model="editPF.field_address.thoroughfare">
+
+          <div class="clear clearfix"></div>
+        </div>
+      </li>
+      <li ng-if="!userHasRole">
+        <p class="date">How far are you willing to travel?</p>
+        <select class="select" ng-model="filterCondition.field_willing_to_travel"
+                ng-options="opt as opt.label for opt in distances">
+        </select>
+      </li>
+
+      <li>
+        <div class="phone">
+          <p>DOB</p>
+          <select class="select dob_date_D" ng-model="dob_date.day" ng-options="opt as opt.label for opt in dayss">
+          </select>
+          <select class="select dob_date_M" ng-model="dob_date.month" ng-options="opt as opt.label for opt in months">
+          </select>
+          <select class="select dob_date_Y floatLeft" ng-model="dob_date.year"
+                  ng-options="opt as opt.label for opt in years">
+          </select>
+
+          <div class="clear clearfix"></div>
+        </div>
+        <div class="phone">
+          <p>Gender </p>
+          <select class="select profile-select" ng-model="filterCondition.field_gender"
+                  ng-options="opt as opt.label for opt in genders"/>
+
+          <div class="clear clearfix"></div>
+        </div>
+      </li>
+
+      <li>
+        <p class="date">Contact Details</p>
+
+        <p class="email"><span>Email </span> <a href="mailto:{{users.profile.mail}}">{{users.profile.mail}}</a></p>
+
+        <p class="mail-add">To change your email address, <a href="#">please get in touch</a></p>
+
+        <div class="phone">
+          <p>Phone</p>
+          <input type="text" id="txt-field2" class="textfield" placeholder="Tap to add"
+                 ng-model="editPF.field_phone.number">
+
+          <div class="clear clearfix"></div>
+        </div>
+        <div class="phone">
+          <p>Mobile</p>
+          <input type="text" id="txt-field2" placeholder="Tap to add" class="textfield"
+                 ng-model="editPF.field_mobile.number">
+
+          <div class="clear clearfix"></div>
+        </div>
+      </li>
+
+      <li ng-if="!userHasRole">
+        <p class="date">Qualifications</p>
+        <input type="text" id="txt-field2" class="textfield profile-textbox" placeholder="Tap to add"
+               ng-model="editPF.field_your_qualifications">
+
+        <div class="clear clearfix"></div>
+      </li>
+
+
+      <li ng-show="!userHasRole">
+        <p class="date">Availability</p>
+        <ul class="chk-box" id="chk">
+          <li>
+            <input type="checkbox" id="checkbox1" value="" ng-model="days"/>
+            <label for="checkbox1">Days</label>
+          </li>
+          <li>
+            <input type="checkbox" id="checkbox2" value="" ng-model="evenings"/>
+            <label for="checkbox2">Evenings</label>
+          </li>
+          <li>
+            <input type="checkbox" id="checkbox3" value="" ng-model="nights"/>
+            <label for="checkbox3">Nights</label>
+          </li>
+          <li>
+            <input type="checkbox" id="checkbox4" value="" ng-model="weekends"/>
+            <label for="checkbox4">Weekends</label>
+          </li>
+        </ul>
+        <div class="clear clearfix"></div>
+      </li>
+      <li ng-if="!userHasRole">
+        <p class="date">Your Skills</p>
+        <textarea rows="9" cols="23" name="comments" id="txt-area2" placeholder="Tap to add"
+                  ng-model="editPF.field_your_skills"></textarea>
+      </li>
+    </ul>
+
+    <input type="submit" class="invisibleButton"/>
+  </form>
+
+  <p class="logo-profile"><img src="img/logo-2.png"></p>
+
+  <div class="clear clearfix"></div>
+</div>
+<div class="profile-resume">
+  <p class="get" ng-click="locationRedirect('profile')"><a>Cancel</a></p>
+
+  <p ng-click="updateProfile()" scroll-to="topOfForm"><a>Save</a></p>
+
+  <div class="clear clearfix"></div>
+  <div class="btm"></div>
+</div>
+

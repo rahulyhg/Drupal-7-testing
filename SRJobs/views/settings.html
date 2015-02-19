@@ -1,0 +1,110 @@
+<div scroll-to=""></div>
+<div id="container-profile">
+  <div class="settings"><h1>Settings </h1>
+
+    <div class="clear clearfix"></div>
+  </div>
+  <div class="clear clearfix"></div>
+  <div class="clear clearfix"></div>
+  </br>
+  <div class="change-password change-password" ng-click="toggleModel()">Change password
+  </div>
+  </br>
+  </br>
+  <div class="tit settings-tit">
+    <h4>Email Notification</h4>
+
+    <div class="loadingBar" ng-if="loadingBar1"><img src="img/icon/loadingBar.gif"></div>
+    <div class="checkbox-container">
+      <span class="checkbox-label" ng-class="{'gray':toggleState1 == false}">Off</span>
+
+      <h1 class="checkbox-inner-container">
+        <label class="check-switch">
+          <input type="checkbox" ng-model="field_email_notifications"/>
+
+          <div class="track" ng-click="toggleModel1()">
+            <div class="knob" ng-class="{'checkBoxRight':toggleState1}"></div>
+          </div>
+        </label>
+      </h1>
+      <span class="checkbox-label" ng-class="{'gray':toggleState1 == true}">On</span>
+    </div>
+  </div>
+  <div class="clear clearfix"></div>
+
+  <div class="tit settings-tit">
+    <h4>Push Notification</h4>
+
+    <div class="loadingBar" ng-if="loadingBar2"><img src="img/icon/loadingBar.gif"></div>
+    <div class="checkbox-container">
+      <span class="checkbox-label" ng-class="{'gray':toggleState2 == false}">Off</span>
+
+      <h1 class="checkbox-inner-container">
+        <label class="check-switch">
+          <input type="checkbox" ng-model="field_push_notifications"/>
+
+          <div class="track" ng-click="toggleModel2()">
+            <div class="knob" ng-class="{'checkBoxRight':toggleState2}"></div>
+          </div>
+        </label>
+      </h1>
+      <span class="checkbox-label" ng-class="{'gray':toggleState2 == true}">On</span>
+    </div>
+  </div>
+  <div class="clear clearfix"></div>
+  </br>
+  </br>
+  </br>
+  </br>
+
+  <div class="loadingBar" ng-if="loadingBar3"><img src="img/icon/loadingBar.gif"></div>
+  <div class="forgot underline logout-text" ng-click="doLogout()"><a>Logout</a></div>
+  <div class="clear clearfix"></div>
+
+
+</div>
+<div id="footer">
+
+</div>
+
+<section class="semantic-content  semantic-content2 " id="modal-text" tabindex="-1" ng-if="toggleState">
+  <div class="modal-inner" id="modal-inner">
+    <div class="model-close-img" ng-click="toggleModel()"></div>
+    <div class="modal-content" id="popup">
+      <h1></h1>
+
+      <div class="loadingBar" ng-if="loadingBar"><img src="img/icon/loadingBar.gif"></div>
+      <div class="scroll-model">
+        <form name="jobForm" ng-submit="" handle-phone-submit>
+          <ul class="diary-notes" id="topOfForm">
+            <li>
+              <p class="date">Old Password</p>
+              <input type="text" id="txt-field4" class="textfield" name="old_password"
+                     ng-model="changePassword.old_password" placeholder="Tap to add">
+            </li>
+            <li>
+              <p class="date">New Password</p>
+              <input type="text" id="txt-field4" class="textfield" name="new_password"
+                     ng-model="changePassword.new_password" placeholder="Tap to add">
+            </li>
+            <li>
+              <p class="date">Confirm New Password</p>
+              <input type="text" id="txt-field4" class="textfield" name="confirm_new_password"
+                     ng-model="changePassword.confirm_new_password" placeholder="Tap to add">
+            </li>
+          </ul>
+          <div class="clear clearfix"></div>
+          <div class="profile-resume">
+            <p class="create-rol" ng-click="" scroll-to="topOfForm"><a>Save</a></p>
+
+            <div class="clear clearfix"></div>
+          </div>
+          <input type="submit" class="invisibleButton"/ />
+        </form>
+      </div>
+    </div>
+  </div>
+  <a href="" class="modal-close" title="Close this modal" ng-click="toggleModel()">×</a>
+</section>
+
+

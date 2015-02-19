@@ -1,0 +1,460 @@
+@media only screen and (min-width:1680px) {.resp-vtabs .resp-tabs-container .map-tit{height: 115px;}}
+@media only screen and (min-width:1900px) {.resp-vtabs .resp-tabs-container .map-tit{height: 108px;}}
+@media only screen and (min-width:480px) {h1.your-profile{background-size: 30px;} }
+@media only screen and (max-width:640px) {#container1 .diary-notes li.map-industries li ul.industry li .chk-box li{ margin:0 0 4% 0;clear: left;}.industry .select1,.edit-map .diary-notes li .profile-select{padding-left: 6px;font-size: 25%;}}
+@media only screen and (max-width:480px) {.map-select{background-size: 7% !important;}}
+@media only screen and (min-width:1200px) {#modal-text #modal-inner #popup .profile-resume{margin-bottom: 5%;} }
+@media only screen and (min-width:1024px) {.browse-candidates-fixed {width:33%!important;}
+.edit-map .diary-notes li #txt-field2{font-size: 25%!important;}}
+@media only screen and (max-width:1024px) {
+
+.country {
+width: 80% !important;
+margin: 2% 0 3% 18% !important;
+}
+#txt-field2, #txt-field3{width: 76%;}
+.edit-map .diary-notes li #txt-field2{font-size: 25%!important;}
+.job li a, .hours li a, .history-help li a{font-size: 190%;}
+.demo .add-candidate .edit-name{width:71%;}
+.view-active-roles .add-candidate .edit-name{width: 95.3%;}
+.resp-vtabs .resp-tabs-container .map-tit{height: 136px;}
+}
+@media only screen and (max-width:768px) {
+.shortlist-left{background: #E3B62C url(../img/shortlist.png) no-repeat 29% center;}
+#txt-field2, #txt-field3{width: 73%;}
+.phone p{width: 18%;}
+.chk-box li{margin-right: 2%;}
+#chk li {margin: 2% 6% 3% 0%;}
+.job li a, .hours li a, .history-help li a{font-size: 140%;}
+#header1 .home-top li{margin: 0 15px;}
+#header1 .home-top li.last{margin: 0 0 0 15px;}
+h1.search-candidate{font-size: 190%;background-size: 4% 28%;}
+#txt-field4{ font-size:70%;}
+.create-role a, .search-candidate a{font-size: 80%;}
+.search-candidate a{background: url(../img/icon/search2.png) no-repeat 17% center;}
+#container1 .chk-box li label{font-size: 14px; padding:7% 0% 3% 22px}
+#container1 .diary-notes li.map-industries li ul.industry li .chk-box li{ margin:0 0 4% 0;}
+#container1 .diary-notes li.map-industries li ul.industry li.required-chk-box{ width:95%;}
+.social li a{font-size: 130%;}
+.search-role1 .search-candidate a{font-size:120%;background-size: 7%;background-position: 12% center;}
+.search-role1 .create-role p{font-size:80%;}
+.search-role1 .create-role h2{font-size:120%;}
+.active-roles h2, .recent-added h2{font-size:120%;}
+.active-roles h2{background-size: 10%;}
+.recent-added h2{background-size: 6%;}
+.recent-added li.add-candidate h2{font-size:90%;}
+.add-candidate h3{font-size:60%;}
+#roles .diary-notes li p{font-size: 15px;}
+.active-roles h3.add-role a{font-size: 80%;}
+.add-candidate .edit-name{padding: 10px 0 5px 30px;}
+#roles .diary-notes li:last-child{margin-bottom:24%;}
+#roles ul.diary-notes{height:640px;}
+.recent-added ul.recent-add{height: 642px;}
+ul.resp-tabs-list {display: none;}
+h2.resp-accordion {display: block;background: #6E7A84;margin: 2%;}
+.resp-vtabs .resp-tab-content {border: 1px solid #C1C1C1;padding: 3%; background:#FFF;margin: 0% 2% 2% 2%;}
+h2.resp-accordion .edit-name h4 {display: none;}
+.resp-vtabs .resp-tabs-container {border: none;float: none;width: 100%;min-height: initial;clear: none;height: auto;padding: 0;margin-bottom: 20%;background:#535A61;}
+.resp-accordion-closed {display:none !important;}
+.resp-vtabs .resp-tab-content:last-child {border-bottom: 1px solid #c1c1c1 !important;}
+h2.resp-tab-active .edit-name h4 {display:block;color: #A3F3E9;font-size: 9px;background: url(../img/swipe.png) no-repeat left center;padding-left: 11%;font-family: "Open Sans Semibold";margin-left: 8%;width: 100%;margin-top: 5%;padding-left: 15%;}
+h2.resp-accordion .edit-name h2 {color: #FFF;font-size: 18px;font-family: "Open Sans Light";padding: 6% 2% 1% 8%;width: 100%;}
+h2.resp-accordion .edit-name h3 {color: #434A50;font-weight:bold;font-size:14px;padding: 0% 2% 3% 8%;width: 100%;}
+h2.resp-accordion h1 {color: #FFF;}
+.shortlist {width: 100%;height: auto;bottom: 0;padding:0;left: 0%;}
+.shortlisted{margin: 3% 5% 2% 0%;}
+#roles .diary-notes li:last-child{margin-bottom:18%;}
+.demo {margin: 5%;width: 90%;}
+.edit-search{padding: 1% 3.8% 3%;width: 92%;position: relative;z-index: 0;height: auto;border: 1px solid #19B19E;}
+.edit-search p{padding: 2% 0 2% 5%;}
+.edit-search input{background: #2A8DCC url(../img/icon/search.png) no-repeat 39% center;padding: 2% 0% 2% 3%;}
+.view-active-roles .edit-search p.add-new-role{padding: 2% 0% 2% 3%;}
+.view-active-roles .resp-vtabs .resp-tabs-container .profile-user .ur-name h1, .view-active-roles .resp-vtabs .resp-tabs-container .profile-user .ur-name h2{font-size: 180%;z-index: 0;}
+.view-active-roles .shortlist{padding: 0%;width: 100%;}
+.view-active-roles .shortlist .search-candidate a {margin: 0 6%;}
+h2.resp-accordion h1 {background: #6E7A84;border: 5px solid #535A61;-moz-border-radius: 100%;border-radius: 100%;-webkit-border-radius: 100%;width: 61px;height: 61px;float: left;padding: 0 0 0 0;color: #FFFFFF;font-size: 18px;font-family: "Open Sans Semibold";text-align: center;line-height: 60px;position: relative;z-index: 0;}
+h2.resp-tab-active h1 {background: #2ACCB8;border: 5px solid #19B19E;}
+h2.resp-tab-active{padding: 0px 0 0 48px;height: 71px;background: #2ACCB8;top: 0px;z-index: 0;}
+h2.resp-accordion .edit-name{float: left;margin-top:1%;}
+h2.resp-tab-active .edit-name{margin-top:0%;}
+#verticalTab{border: #FFF 1px solid;}
+.view-active-roles .shortlist .edit-role a{margin: 3% 0% 3% 5%;}
+.view-active-roles .shortlist .search-candidate a{margin: 3% 0% 3% 4.5%;}
+.view-active-roles .shortlist .shortlisted a{margin: 3% 0% 3% 4.5%;}
+.resp-vtabs .resp-tabs-container .profile-user h1{z-index:0;}
+.currently{width:auto;padding: 2% 3% 2% 5%;}
+.view-active-roles h2.resp-accordion .edit-name{float:none;}
+.view-active-roles  h2.resp-tab-active{height: auto;}
+.view-active-roles h2.resp-accordion .edit-name h2{padding: 0% 2% 1% 0%;}
+.view-active-roles h2.resp-accordion .edit-name h3{padding: 0%;}
+.view-active-roles h2.resp-accordion .edit-name{margin-top: 0%;}
+.view-active-roles .edit-search p.add-new-role {padding: 1% 0% 1% 3%;}
+#modal-text .modal-inner{margin-left: -265px;}
+#modal-text #modal-inner #popup h1 {font-size: 200%;line-height: 0;margin-top: 6%;margin-bottom: 3%;}
+#modal-text #modal-inner #popup select.select, #modal-text #modal-inner #popup select.select1, #modal-text #popup .diary-notes li p, #modal-text #modal-inner #popup #chk1 li label{font-size: 14px;}
+input[type=checkbox]:not(old) + label, input[type=radio ]:not(old) + label{margin-left: -32px;padding-left: 22px;}
+#modal-text #modal-inner #popup .diary-notes li.edit-map, #modal-text #modal-inner #popup .maps{height: 160px;}
+#modal-text #modal-inner #popup .profile-resume p{font-size: 18px;}
+}
+@media only screen and (max-width: 568px) {
+.profile-select{width: 68% !important;margin-left: 41% !important;}
+.shortlist-left{background: #E3B62C url(../img/shortlist.png) no-repeat 22% center;}
+#container1 .diary-notes li.map-industries li ul.industry li.required-chk-box {width: 95%;}
+#container1 .chk-box li label{font-size: 12px;padding: 9% 0% 3% 22px;}
+h1.search-candidate{font-size: 150%;background-size: 5%;}
+.industry .select1,.edit-map .diary-notes li .profile-select{font-size: 100%!important;height: 32px !important;background-size: 12% !important;line-height: 32px !important;}
+.industry .select1{background-size: 8% !important;}
+#txt-field4 {font-size: 100%;line-height:160%;}
+.edit-map .diary-notes li #txt-field2{font-size: 25%!important;}
+select.select1{font-size: 14px;height: 30px;line-height: 30px;background-size: 6%;}
+#container1 .diary-notes li.map-industries li.edit-map, .maps1{ height:176px;}
+.search-candidate a {background: url(../img/icon/search2.png) no-repeat 21% center;background-size: 8%;}
+#header1 .home-top li{margin: 0 9px;}
+#header1 .home-top li.last{margin: 0 0 0 9px;}
+.job li a, .hours li a, .history-help li a {font-size:110%;background-size: 11% !important;}
+.hours li a.add-wages{background-size: 15% !important;}
+.history-help li a.history{background-size: 8% !important;}
+.history-help li a.help{background-size: 10% !important;}
+.job li a{background-size: 9% !important;}
+.job li a.job-interview{background-size: 11% !important;}
+.profile-resume p, .send-resume p{font-size: 230%;}
+.profile-user h1{border: 6px solid #29CBB7;width: 120px;height: 120px;line-height: 120px;margin: 0% 0;font-size: 300%;}
+p { font-size:110%;}
+p.date{ font-size:100%;}
+.tit .check li{padding: 1% 8%; font-size:85%;}
+.profile-user h2{font-size: 240%;width: 165px;}
+.profile-user .edit-name{padding: 3% 15% 4% 17%;margin: 0;height: auto;}
+.chk-box li label{font-size: 18px;}
+select.select{background: #EEEEEE url(../img/select-arrow1.png) no-repeat right center; height:43px;background-size: auto 87%; line-height:43px;font-size: 90%;}
+.country {
+   width:67% !important;
+   margin-left: 30% !important;
+}
+#txt-field2, #txt-field3{width: 64%;}
+.diary-notes li p{font-size: 90%;}
+p.email span, .diary-notes li p.mail-add a{font-size:100%;}
+.phone p{width:27%;}
+#chk input[type=checkbox]:not(old) + label,
+#chk input[type=radio   ]:not(old) + label{margin-left  : -28px;padding-left : 28px;background   : url('../img/icon/checks.png') no-repeat 0 0;line-height  : 20px;}
+#chk input[type=checkbox]:not(old):checked + label {background-position: 0 -24px;}
+#chk li {margin: 1% 5% 2% 0%;}
+.search-role1 .search-candidate a {font-size: 120%;background-position: 23% center;background-size: 6%;padding: 6% 0 6% 0%;}
+.add-candidate h3 {font-size: 12px;}
+.recent-added li.add-candidate h2 {font-size: 100%;}
+.active-roles, .recent-added{width:100%;}
+#roles ul.diary-notes{width:96%;}
+.active-roles h2 {background-size: 5%;}
+.add-candidate .edit-name {padding: 10px 0 5px 35px;}
+.search-role1 .create-role, .search-role1 .search-candidate{width:100%;}
+.active-roles h2, .recent-added h2{padding: 20px 0 20px 75px;}
+.recent-added h2{padding: 20px 0 20px 70px; font-size: 120%;}
+.active-roles h3.add-role a {font-size: 120%;}
+.recent-added li.add-candidate h2{ padding:0;}
+#roles .diary-notes li{padding: 3% 5% 2% 10%;}
+.resp-vtabs .resp-tabs-container{margin-bottom: 20%;}
+.shortlisted{font-size: 100%;background: #E3B62C url(../img/shortlist.png) no-repeat 16% center;background-size: 10%;padding: 2% 10%;margin-top: 3%;}
+.edit-search input {background: #2A8DCC url(../img/icon/search.png) no-repeat 34% center;}
+.view-active-roles .resp-vtabs .resp-tabs-container .profile-user .ur-name h1, .view-active-roles .resp-vtabs .resp-tabs-container .profile-user .ur-name h2{font-size: 140%;}
+.view-active-roles .shortlist .edit-role a, .view-active-roles .shortlist .shortlisted a, .view-active-roles .shortlist .search-candidate a{font-size: 100%;background-size: 9%;padding: 3% 3% 3% 8%;}
+.view-active-roles .shortlist .edit-role a{background-size: 15%;}
+.view-active-roles .shortlist .shortlisted{margin:0;}
+.view-active-roles .shortlist .edit-role a{margin: 2% 0% 2% 5%;}
+.view-active-roles .shortlist .search-candidate a{margin: 2% 0% 2% 2%;}
+.view-active-roles .shortlist .shortlisted a{margin: 2% 0% 2% 2%;}
+.resp-vtabs .resp-tabs-container .profile-user h2{font-size: 190%;}
+#modal-text #modal-inner #popup h1 {font-size: 180%;line-height: 0;margin-top: 6%;margin-bottom: 3%;}
+#modal-text #modal-inner #popup select.select, #modal-text #modal-inner #popup select.select1, #modal-text #popup .diary-notes li p, #modal-text #modal-inner #popup #chk1 li label{font-size: 13px;}
+input[type=checkbox]:not(old) + label, input[type=radio ]:not(old) + label{margin-left: -32px;padding-left: 22px;}
+#modal-text #modal-inner #popup .diary-notes li.edit-map, #modal-text #modal-inner #popup .maps{height: 160px;}
+img {max-width: 90%;}
+.logo {margin-left: 8%;}
+h1.facebook {font-size: 260%;}
+h2.facebook-acc, .social li a {font-size: 130%;}
+#chk li {margin: 1% 4% 2% 0%;}
+}
+@media only screen and (max-width: 480px) {
+.map-input{width: 49% !important;}
+.map-select{font-size: 90% !important;margin-left: 40% !important;width: 57% !important;background-size: 7% !important;}
+.checkBoxRight{float: right;}
+.checkbox-container{position: relative;top: -50px;}
+.checkbox-label{font-size: 118%;}
+.checkbox-inner-container{line-height:0;display: inline-block;position: relative;top: 55px;}
+
+.logo1{margin: 0 29% 0 4%;width: 50%;}
+#header1 .home-top li {margin: 0 6px;}
+#header1 .home-top li.last{margin: 0 0 0 6px;width: auto;}
+.logo {margin-left: 6%;padding-top: 1%;}
+.home-top li{margin: 0 5% 0 5%;}
+.home-top{width:120px;}
+.home-top li.last{margin: 0 0% 0 5%;}
+h1, h2, h3, h4, h5, h6{font-size: 150%;line-height:120%;}
+h2 {font-size: 130%;}
+h3 {font-size: 120%;}
+h4 {font-size: 110%;}
+h6 {font-size: 100%;}
+li{font-size: 100%;line-height: 100%;}
+p{font-size: 100%;}
+p {font-size: 100%;line-height: 130%;padding-bottom: 10px;}
+p.date, .diary-notes li p.date{font-size: 70%;line-height: 130%;}
+.edit-map .diary-notes li #txt-field2{font-size: 90%!important;}
+.chk-box li{margin: 4% 3% 3% 0;}
+#chk li {margin: 1% 4% 2% 0%;}
+.chk-box li label{font-size: 100%;line-height: 130%;}
+.prettycheckbox, .prettyradio{margin: 0% 0 0 0;padding: 0% 1% 0% 0%;}
+#container li.view a{font-size:80%;line-height:130%;}
+.back img{max-width:76%;}
+.home-top li a img{max-width:100%;}
+.logo img{max-width:100%;}
+.logo-acc img{max-width:76%;}
+.logo{width: 140px;}
+.back, .home-top{padding-top: 0px;}
+.home-top li.home-icon, .home-top li.user-icon, .home-top li.settings-icon{background-size: 100% 100%;}
+.home-top li, .home-top li a{height: 30px;width: 30px;}
+.home-top li.hide{width: 30px;}
+h2.order{font-size: 130%;width: 40px;background: #149C8B;-moz-border-radius: 100%;border-radius: 100%;height: 40px;line-height: 40px;}
+.job li a, .hours li a, .history-help li a {font-size:130%;}
+h1.facebook{font-size: 200%;}
+h2.facebook-acc, .social li a{font-size: 120%;}
+.social li { padding: 8% 3% 8% 22%;}
+#header-profile{border-bottom:10px solid #19B19E;}
+.profile-user .edit-name {padding: 10px 0 5px 55px;margin: 0;height: auto;left: 50px;}
+.view-active-role .edit-name {padding: 10px 0 5px 2px;margin: 0;height: auto;left: 35px;}
+.view-active-role .edit-name .name{font-size: 15px;}
+.view-active-role .edit-name .inner-name{font-size: 12px;}
+.profile-user h2 {font-size: 200%;width: 200px;line-height: 1;min-height: 30px;}
+.profile-label .edit-name  h2{min-height: 60px;}
+.profile-user h1{border: 6px solid #29CBB7;width: 80px;height: 80px;font-size: 170%;line-height: 80px;}
+.profile-user h3{font-size:120%;}
+.diary-notes li.edit-map h4.map-tit, .profile-user h4.map-tit{font-size: 70%;}
+.tit .check li{padding:1% 7% 1% 8%;}
+p.logo-profile img{width:70%;}
+.profile-resume p, .send-resume p{font-size: 200%;}
+.btm{height:10px;}
+#txt-field2, #txt-field3, #txt-area2{font-size: 16px;}
+p.email a, p.email span{font-size: 100%;}
+.diary-notes li p.mail-add, .diary-notes li p.mail-add a{font-size: 80%;}
+h1.work-diary{padding: 5% 0 5% 13%;background-size: 6%;}
+.notification h1{background-size: 11%;}
+.settings h1,.upskills h1 {background-size: 15%;}
+.social li.fb-coonect, .social li.skip{background-size: 5%;background-position: 10% center;}
+.search-role1 .search-candidate a {font-size: 110%;background-position: 16% center;}
+#roles .diary-notes li:last-child{margin-bottom:13.5%;}
+#roles ul.diary-notes{height:450px;}
+.recent-added ul.recent-add{height:452px;}
+.resp-vtabs .resp-tabs-container .profile-user h2{font-size: 180%;}
+.resp-vtabs .resp-tabs-container .profile-user h1{width: 60px;height: 60px;font-size: 120%;line-height: 60px;}
+.browse-tit{width:100%;margin-right: 0%;}
+.resp-vtabs .resp-tabs-container .tit p, .resp-vtabs .resp-tabs-container .chk-box li label{font-size: 100%;}
+.resp-vtabs .resp-tabs-container .browse-tit .tit{margin: 0 0 3% 0%;}
+.resp-vtabs .resp-tabs-container .map-tit{padding: 4% 10% 4% 2%;}
+.resp-vtabs .resp-tab-content .chk-box li {margin: 1% 3% 2% 0;}
+.currently h4, .currently p{font-size: 80%;}
+.currently{width:auto;}
+.shortlisted{font-size: 100%;background: #E3B62C url(../img/shortlist.png) no-repeat 16% center;background-size: 10%;padding: 2% 10%;}
+.shortlist {padding: 2% 3% 0% 3%;}
+.resp-vtabs .resp-tabs-container{margin-bottom: 15%;}
+h2.resp-tab-active .edit-name h4{padding-left: 15%;}
+.view-active-roles .shortlist .edit-role a, .view-active-roles .shortlist .shortlisted a, .view-active-roles .shortlist .search-candidate a {padding: 3% 2% 3% 6%; background-position:9% center;font-size: 90%;}
+.view-active-roles .shortlist .search-candidate a{background-position:5% center;}
+.view-active-roles .edit-search p.add-new-role {padding: 3% 0% 1% 3%;}
+#modal-text #popup .profile-user h2{font-size: 28px;}
+#modal-text #popup .profile-user h3{font-size: 15px; background-size:6%;}
+.semantic-content .modal-close:after{background: #fff;border-radius: 2px;height: auto;width: auto;line-height: 20px;}
+#modal-text #popup .profile-user .ur-name{width: 74%;}
+/*.semantic-content .modal-close:after, .semantic-content .modal-inner{top: 0%;}*/
+.add-new-role .modal-inner {top: 0%;left: 19%;margin-left: -19%;width: 100%;}
+.add-new-role .modal-close:after{top: 0.4em;left: 1em;margin-left: 0;}
+#modal-text #modal-inner #popup h1 {font-size: 180%;line-height: 0;margin-top: 10%;margin-bottom: 5%;}
+.workdiaryModel #modal-inner #popup h1 {margin-bottom: 0%!important;}
+.semantic-content2 #modal-inner #popup h1 {font-size: 150% !important;}
+#modal-text #modal-inner #popup select.select, #modal-text #modal-inner #popup select.select1, #modal-text #popup .diary-notes li p, #modal-text #modal-inner #popup #chk1 li label{font-size: 13px;}
+input[type=checkbox]:not(old) + label, input[type=radio ]:not(old) + label{margin-left: -32px;padding-left: 22px;}
+#modal-text #modal-inner #popup .diary-notes li.edit-map, #modal-text #modal-inner #popup .maps{height: 160px;}
+#modal-text #modal-inner #popup ul.diary-notes, #modal-text #modal-inner #popup ul.popup-rht{width:100%;margin:0;}
+.login-cont li .login-label, .forgot a{font-size: 100%;}
+.login-tab li a, .home-one li a{font-size: 170%;}
+.view-active-role h2{min-height: 30px;}
+.role-title-popup{line-height: 1;float: left;}
+}
+@media only screen and (max-width: 420px) {
+
+.checkBoxRight{float: right;}
+.checkbox-container{position: relative;top: -50px;}
+.checkbox-label{font-size: 118%;}
+.checkbox-inner-container{line-height:0;display: inline-block;position: relative;top: 55px;}
+.industry .select1,.edit-map .diary-notes li .map-select{font-size: 90% !important;background-size: 7% !important;}
+h1.search-candidate{font-size: 120%;}
+.back{width:30px;}
+.job li, .hours li, .history-help li {padding: 5.5% 3% 5.2% 15%;}
+.notification h1,.settings h1,.upskills h1{padding: 2% 0 2% 15%;}
+h1, h2, h3, h4, h5, h6{font-size: 130%;line-height:120%;}
+h2 {font-size: 120%;}
+h3 {font-size: 110%;}
+h4 {font-size: 100%;}
+h6 {font-size: 100%;}
+li{font-size: 100%;line-height: 100%;}
+p{font-size: 100%;}
+.profile-resume p, .send-resume p{font-size: 170%;}
+h1.your-profile{padding: 5% 0 5% 15%;margin-bottom: 3%;}
+.tit .check li {padding: 1% 7% 1% 9%;}
+p.m-btm-200{margin-bottom:100px;}
+#container1 .diary-notes li.map-industries li.edit-map {width: 100%;margin-right: 0;}
+#container1 .diary-notes li.map-industries li{width:100%;}
+.create-role, .search-candidate{width:100%;margin:0 0 1% 0;}
+.create-role a, .search-candidate a {font-size: 100%;padding: 8% 0 8%;}
+.search-candidate a {background: url(../img/icon/search2.png) no-repeat 18% center;background-size: 7%;}
+#txt-field4 {font-size: 80%;font-size: 110%;}
+.search-role1 .search-candidate a {font-size: 100%;background-position: 14% center;}
+.currently {float: none;padding: 2% 2% 0% 8%;}
+.shortlisted{width: 70%;margin: 0% 5% 3% 0%;background: #E3B62C url(../img/shortlist.png) no-repeat 31% center;padding: 2% 10%;background-size: 6%;}
+.resp-vtabs .resp-tabs-container {margin-bottom: 33%;}
+.resp-vtabs .resp-tabs-container .tit h4.map-tit {font-size: 14px;width: 86%;height: auto;padding: 4% 10% 4% 4%;}
+.resp-vtabs .resp-tabs-container .maps{width: 100%;}
+.resp-vtabs .resp-tabs-container .profile-user h2 {font-size: 130%;}
+.resp-vtabs .resp-tabs-container .profile-user h1 {width: 40px;height: 40px;font-size: 100%;line-height: 40px;}
+.view-active-roles .shortlist .edit-role a, .view-active-roles .shortlist .shortlisted a, .view-active-roles .shortlist .search-candidate a {padding: 2% 2% 2% 6%;font-size: 80%;}
+#modal-text #popup .profile-user .ur-name {width: 70%;}
+#modal-text #popup .profile-user h2 {font-size: 20px;}
+#modal-text #popup .profile-user h1 {width: 40px;height: 40px;border: 5px solid #29CBB7;font-size: 16px;line-height: 40px;}
+#modal-text #popup .profile-user h3 {font-size: 13px;background-size: 6%;}
+}
+@media only screen and (max-width: 384px) {
+.shortlist-left{background: #E3B62C url(../img/shortlist.png) no-repeat 10% center;font-size: 105%;}
+.job li a, .hours li a, .history-help li a {font-size:110%;}
+h2.facebook-acc, .social li a{font-size: 110%;}
+h2.facebook-acc{font-size: 80%;}
+.home-top li {margin: 0 5% 0 5%;}
+.home-top li.last{margin:2% 0% 0 5%}
+.home-top {width: 90px; height: 30px; overflow-y: hidden;}
+.logo1{margin: -4px 29% 0 4%;width: 45%;}
+#header1 .home-top li {margin: 0 3px;}
+#header1 .home-top li.last{margin: 0 0 0 3px;width: auto;}
+.active-roles h2, .recent-added h2{padding: 20px 0 20px 65px;}
+.add-candidate .edit-name{width: 75%; padding:4px 0 10px 35px}
+.recent-added h2{padding: 20px 0 20px 60px;}
+#roles .diary-notes li:last-child{margin-bottom:20%;}
+.view-active-role-search{height: 65px !important;}
+.edit-search input {background: #2A8DCC url(../img/icon/search.png) no-repeat 22% center;padding: 2% 0% 2% 3%;font-size: 100%;background-size: 7%;}
+.edit-search {padding: 3% 3.2% 5% 4%;height: auto;}
+.logo1 img{width:80%;}
+.shortlisted{font-size: 90%;background: #E3B62C url(../img/shortlist.png) no-repeat 35% center;background-size: 5%;padding: 2% 10%;float: none;margin: 0 auto;margin-bottom: 3%;}
+.shortlist {padding: 0;}
+.resp-vtabs .resp-tabs-container{margin-bottom: 35%;}
+h2.resp-tab-active .edit-name h4{padding-left: 15%;margin-left: 5%;}
+.view-active-roles .shortlist .edit-role a, .view-active-roles .shortlist .shortlisted a, .view-active-roles .shortlist .search-candidate a {padding: 2% 2% 2% 5%;font-size: 100%;width: 83%;margin: 0;background-size: 5%;background-position: 30% center;margin: 2% 5%;}
+.view-active-roles .shortlist .search-candidate a{margin: 0% 5%;background-position: 19% center;}
+.view-active-roles .edit-search p.add-new-role {padding: 2% 0% 2% 3%;font-size: 100%;height: auto;}
+.view-active-roles .shortlist .edit-role a{background-position: 35% center;}
+.view-active-roles .resp-vtabs .resp-tabs-container .profile-user .ur-name h1, .view-active-roles .resp-vtabs .resp-tabs-container .profile-user .ur-name h2 {font-size: 120%;}
+h2.resp-accordion .edit-name h2, h2.resp-accordion .edit-name h3{font-size: 12px;padding: 0% 2% 1% 4%;}
+h2.resp-accordion .edit-name h2{font-size: 17px;padding: 4% 2% 1% 4%;}
+h2.resp-accordion{padding: 10px 15px;}
+h2.resp-tab-active{height:auto;}
+.view-active-roles .shortlist .shortlisted a{background-size: 5%;}
+h2.resp-accordion h1 {width: 45px;height: 45px;font-size: 15px;line-height: 45px;}
+h1.work-diary {padding: 5% 0 5% 13%;font-size: 110%;background-size: 6%;}
+.logo img {max-width: 80%;}
+.logo {margin-left: 6%;}
+#header {padding: 10% 3% 3% 3%;}
+.job li a.job-interview {background-size: 12% !important;}
+.login-tab li.login, .login-tab li.createAccount, .home-one li.notifications, .home-one li.work-diary, .home-one li.profile, .home-one li.upskill{background-size: 10%;}
+.home-one li.notifications, .home-one li.work-diary, .home-one li.upskill{background-size: 7%;}
+.login-cont li .login-label, .forgot a{font-size: 90%;}
+.login-tab li a,  .home-one li a{font-size: 130%;}
+.home-one li.notifications .numberCircle{width: 16px;height: 16px;padding: 8px;font: 20px Arial, sans-serif; line-height:16px;}
+}
+@media only screen and (max-width: 320px) {
+
+.back img{max-width: 70%;}
+h1, h2, h3, h4, h5, h6{font-size: 117%;line-height: 117%;}
+h2 {font-size: 120%;}
+h3 {font-size: 110%;}
+h4 {font-size: 77%;}
+h6 {font-size: 100%;}
+li{font-size: 100%;line-height: 100%;}
+p{font-size: 100%;}
+.profile-resume p, .send-resume p{font-size: 150%;}
+h1.facebook {font-size: 160%;}
+.social li {padding: 7% 3% 7% 23%;}
+.social li.fb-coonect, .social li.skip{background-size: 6%;background-position: 10% center;}
+.logo img, .back img, .home-top li a img, .logo-acc img{max-width:80%;}
+.home-top li a img{max-width:100%;}
+.logo {width: 120px;padding:0;}
+.logo-acc img {max-width: 51%;}
+.home-top li, .home-top li a {height: 22px;width: 22px;}
+.chk-box li label {font-size: 80%;}
+#chk input[type=checkbox]:not(old) + label, #chk input[type=radio ]:not(old) + label {line-height: 24px;margin-left: -40px;padding-left: 23px;}
+}
+
+
+@media screen and (max-width: 600px) {
+ #modal-text .modal-inner {
+    width: auto;
+    left: 20px;
+    right: 20px;
+    margin-left: 0;
+  }
+  #popup{ width:auto;}
+  #modal-text .modal-close {
+    left: auto;
+    right: 33px;
+    margin-left: 0;
+  }
+  #modal-text .modal-close:after {
+    margin-left: 40%;
+  }
+}
+.viewShortlistModel .modal-inner{top: 12.5% !important;height: 75% !important;}
+
+@media screen and (min-height: 200px) and (max-height: 320px) {
+	.scroll-model {height: 75%;}
+	.scroll-model1 {height: 45%;}
+	.scroll-model2 {height: 65%;}
+}
+
+@media screen and (min-height: 320px) and (max-height: 480px) {
+	.scroll-model {height: 85% !important;}
+	.scroll-model1 {height: 55% !important;}
+	.scroll-model2 {height: 79% !important;}
+}
+
+@media screen and (min-height: 600px) {
+	.scroll-model {height: 85%;}
+	.scroll-model1 {height: 55%;}
+	.scroll-model2 {height: 79%;}
+}
+
+@media screen and (min-height: 600px) and (max-height: 768px){
+	.scroll-model {height: 85% !important;}
+	.scroll-model1 {height: 55% !important;}
+	.scroll-model2 {height: 78% !important;}
+}
+@media screen and (min-height: 769px) and (max-height: 800px){
+	.scroll-model {height: 85% !important;}
+	.scroll-model1 {height: 55% !important;}
+	.scroll-model2 {height: 80% !important;}
+}
+@media screen and (min-height: 800px) {
+	.scroll-model {height: 90%;}
+	.scroll-model1 {height: 60%;}
+	.scroll-model2 {height: 85%;}
+}
+@media screen and (min-height: 800px) and (max-height: 1280px) {
+	.scroll-model {height: 85% !important;}
+	.scroll-model1 {height: 68% !important;}
+	.scroll-model2 {height: 84% !important;}
+}
+@media screen and (max-width: 1280px){
+.demo .add-candidate .edit-name1{width:75% !important;}
+}
+@media screen and (min-width: 1281px){
+.demo .add-candidate .edit-name1{width:80% !important;}
+}
+@media screen and (min-width: 160px){
+.demo .add-candidate .edit-name1{width:83% !important;}
+}
+@media screen and (min-width: 768px){
+  #header {padding: 30px 3%;}
+  .login-tab li{ padding: 30px 3% 30px 16%;}
+}
+
