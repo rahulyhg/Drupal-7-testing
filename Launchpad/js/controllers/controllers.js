@@ -29,8 +29,8 @@ launchpad.controller("MainController",function($scope,$location,$rootScope,$wind
 
 	$rootScope.topics = Topics.query();
 
-	//setting topic label
-    //used this array to form select list for field im intrested in , experienced in.
+
+    //Used this array to form select list for field im intrested in , experienced in.
 	$scope.vocabTag = [
       {label: "- None -", value: "0"},
       {label: "Education", value: "1"},
@@ -38,35 +38,23 @@ launchpad.controller("MainController",function($scope,$location,$rootScope,$wind
       {label: "Investment", value: "3"}
     ];
 
-	$scope.toSetLabel = function(id){
-		var flag = 0;
-		for(var i=0;i<$rootScope.allUsers.length;i++){
-			if($rootScope.allUsers[i].field_ask_me_about){
-				if($rootScope.allUsers[i].field_ask_me_about.target_id == id){
-					flag = 1;	
-				}
-			}
-		}
-		if(flag == 1){
-			return true;
-		} else {
-			return false;
-		}
-	};
-
 	// get user by Category (Experience)
 
 	$scope.getCategoryUserByExperience = function(tid){
 		$scope.categoryUserByExperience = [];
 		$scope.categoryUserByExperience.length = 0;
 		for(var i=0;i<$rootScope.allUsers.length;i++){
-			if($rootScope.allUsers[i].field_ask_me_about){
-				if($rootScope.allUsers[i].field_ask_me_about.target_id == tid){
+
+			if($rootScope.allUsers[i].field_ask_me_about_6){
+				for (var j = 0; j < $rootScope.allUsers[i].field_ask_me_about_6.length; j++) {				
+				  if($rootScope.allUsers[i].field_ask_me_about_6[j] == tid){
 					$scope.categoryUserByExperience.push({pid : $rootScope.allUsers[i].pid,
 													label : $rootScope.allUsers[i].label,
 													photo : $rootScope.allUsers[i].field_website_profile_photo ? $rootScope.allUsers[i].field_website_profile_photo.filename : ''
 													});
-				}
+					break;
+				  }
+			    };
 			}
 		}
 		
@@ -80,13 +68,17 @@ launchpad.controller("MainController",function($scope,$location,$rootScope,$wind
 		$scope.categoryUserByInterest = [];
 		$scope.categoryUserByInterest.length = 0;
 		for(var i=0;i<$rootScope.allUsers.length;i++){
-			if($rootScope.allUsers[i].field_i_m_interested_in){
-				if($rootScope.allUsers[i].field_i_m_interested_in.target_id == tid){
-					$scope.categoryUserByInterest.push({ pid : $rootScope.allUsers[i].pid,
+
+			if($rootScope.allUsers[i].field_i_m_interested_in_5){
+				for (var j = 0; j < $rootScope.allUsers[i].field_i_m_interested_in_5.length; j++) {				
+				  if($rootScope.allUsers[i].field_i_m_interested_in_5[j] == tid){
+					$scope.categoryUserByInterest.push({pid : $rootScope.allUsers[i].pid,
 													label : $rootScope.allUsers[i].label,
-													photo : $rootScope.allUsers[i].field_website_profile_photo ? $rootScope.allUsers[i].field_website_profile_photo.filename : '',
-											});
-				}
+													photo : $rootScope.allUsers[i].field_website_profile_photo ? $rootScope.allUsers[i].field_website_profile_photo.filename : ''
+													});
+					break;
+				  }
+			    };
 			}
 		}
 		return $scope.categoryUserByInterest;
@@ -148,15 +140,10 @@ launchpad.controller("MainController",function($scope,$location,$rootScope,$wind
 	
 	$scope.setUserProfile = function(currentUser){
 		$rootScope.profile = currentUser.profile;
-		
-		//alert(JSON.stringify($scope.profile));
 	};
 
-
 	// Scroll to top position
-
 	$scope.scrollTop = function(ids){
-		//alert(id);
 		var olds = $location.hash();
   		$location.hash(ids);
 	 	$anchorScroll();
@@ -167,38 +154,43 @@ launchpad.controller("MainController",function($scope,$location,$rootScope,$wind
 	//setting update data config on Update Profile
 
 	$scope.setDataToUpdate = function(data){
-		$scope.newVar = {};
-		$scope.newVar.target_id = data.id;
+		for (var i = 0; i < data.length; i++) {
+			if(data[i].value == 0){
+				continue;
+			}else{
+				$scope.newVar = data[i].value;
+				break;//now for single value further will alter.
+			}
+			
+		};
 		return $scope.newVar;
 	};
 
 	
 	// Display user Interest and Experience in user Detail and Experience page
-
-	//$scope.choiceLabel = [];
-	$rootScope.setUserChoice = function(id){
-		
+     $rootScope.setUserChoice = function(arrids){
 		$scope.choiceLabel = [];
-		for(var i=0;i<$rootScope.topics.length;i++){
-			if($rootScope.topics[i].id == id){
-				//alert(id);
-				$scope.choiceLabel.push({label : $rootScope.topics[i].label,
-									id : $rootScope.topics[i].id
+		for (var i = 0; i < arrids.length; i++) {
+     		
+     		for(var j=1;j<=$scope.vocabTag.length;j++){
+			  if($scope.vocabTag[j].value == arrids[i]){
+				$scope.choiceLabel.push({label : $scope.vocabTag[j].label,
+									id : $scope.vocabTag[j].value
 									});
-				
-			}
-		}
+				break;
+			  }
+		    }
+		};
 		return $scope.choiceLabel;
 	};
-
 
 	// To display Category Label
 
 	$scope.setCategoryLabel = function(tid){
 		$scope.name = '';
-		for(var i=0;i<$rootScope.topics.length;i++){
-			if($rootScope.topics[i].id == tid){
-				$scope.name = $rootScope.topics[i].label;
+		for(var i=0;i<$scope.vocabTag.length;i++){
+			if($scope.vocabTag[i].value == tid){
+				$scope.name = $scope.vocabTag[i].label;
 				break;
 			}
 		}
@@ -252,13 +244,11 @@ launchpad.controller("MainController",function($scope,$location,$rootScope,$wind
 launchpad.controller("HomeController",function($scope,$rootScope,ListUsers,$location,$anchorScroll){
 	$scope.setActiveClass(1);
 	$scope.loading = true;
-	//fbloader_start();
 	$scope.characters = alphabets;
 	$rootScope.allUsers = ListUsers.query();
 	$rootScope.allUsers.$promise.then(function(){
 		$scope.getInitial($rootScope.allUsers);
 		$scope.loading = false;	
-		//fbloader_stop();
 	});
 
 	
@@ -268,7 +258,6 @@ launchpad.controller("HomeController",function($scope,$rootScope,ListUsers,$loca
 launchpad.controller("ExpController",function($scope,$rootScope,ListUsers){
 	$scope.setActiveClass(2);
 	$scope.loading = true;
-	
 	$rootScope.allUsers = ListUsers.query();
 	$rootScope.allUsers.$promise.then(function(){
 		$scope.groupBy();
@@ -278,22 +267,21 @@ launchpad.controller("ExpController",function($scope,$rootScope,ListUsers){
     //Group all user by category ids	
 	$scope.groupBy = function(){
 		$scope.cate = [];
-		for(var j=0;j<$rootScope.topics.length;j++){
-			var flag = $scope.toSetLabel($rootScope.topics[j].id);
-			if(flag){
-				$scope.cate.push({label:$rootScope.topics[j].label,
-					ids : $rootScope.topics[j].id,
+		for(var j=1;j<$scope.vocabTag.length;j++){
+				$scope.cate.push({label:$scope.vocabTag[j].label,
+					ids : $scope.vocabTag[j].value,
 					users:[]
 					});
-			}
 		}
 		
 		for(var i=0;i<$scope.cate.length;i++){
 			var group = $scope.cate[i]; 
 		    for(var j=0;j<$rootScope.allUsers.length;j++){
-				if($rootScope.allUsers[j].field_ask_me_about){
-					if($rootScope.allUsers[j].field_ask_me_about.target_id == $scope.cate[i].ids){
-						$scope.cate[i].users.push($rootScope.allUsers[j]);
+				if($rootScope.allUsers[j].field_ask_me_about_6){
+					for (var k = 0; k < $rootScope.allUsers[j].field_ask_me_about_6.length; k++) {
+                      if($rootScope.allUsers[j].field_ask_me_about_6[k] == $scope.cate[i].ids){
+						$scope.cate[i].users.push($rootScope.allUsers[j]);                      	
+                      }
 					}
 				}
 			}
@@ -304,17 +292,15 @@ launchpad.controller("ExpController",function($scope,$rootScope,ListUsers){
 
 launchpad.controller('UserDetailController',function($scope,$routeParams,ListUsers,$rootScope){
 	$scope.loading = true;
-	//fbloader_start();
 	$scope.userUid = $routeParams.uid;
 	$scope.reqUser = ListUsers.get({pid:$scope.userUid});
 	$scope.reqUser.$promise.then(function(){
-		
-	//	fbloader_stop();
-		if($scope.reqUser.field_ask_me_about){
-			$scope.Exp = $rootScope.setUserChoice($scope.reqUser.field_ask_me_about.target_id);
+
+		if($scope.reqUser.field_ask_me_about_6){
+			$scope.Exp = $rootScope.setUserChoice($scope.reqUser.field_ask_me_about_6);
 		}
-		if($scope.reqUser.field_i_m_interested_in){
-			$scope.Int = $rootScope.setUserChoice($scope.reqUser.field_i_m_interested_in.target_id);
+		if($scope.reqUser.field_i_m_interested_in_5){
+			$scope.Int = $rootScope.setUserChoice($scope.reqUser.field_i_m_interested_in_5);
 		}
 		$scope.loading = false;
 	});
@@ -341,7 +327,6 @@ launchpad.controller("LoginController",function($scope,$cookies,AuthService,$roo
 	$scope.doLogin = function(form) {
 		if(form.$valid) {
 			$scope.loading = true;
-			//fbloader_start();
 			if($scope.rememberMe) {
 				$cookies.username = $scope.credentials.username;
 				$cookies.password = $scope.credentials.password;
@@ -361,16 +346,13 @@ launchpad.controller("LoginController",function($scope,$cookies,AuthService,$roo
 				$scope.setUserProfile($rootScope.currentUser);
 				$scope.errormsg = '';
 				$scope.locationRedirect('profile');
-				//fbloader_stop();
 			}).error(function(error){
 				$scope.errormsg = 'Username or Password is incorrect';
 				$scope.loading = false;
-				//fbloader_stop();
 			});
 
 		} else {
 			$scope.errormsg = 'Invalid Username or Password';
-			//fbloader_stop();
 		}
 	};
 });
@@ -399,14 +381,12 @@ launchpad.controller("SignupController",function($scope,AuthService,$rootScope,$
 			if($scope.user.email == $scope.user.email_confirm){
 				
 				$scope.loading = true;
-				//fbloader_start();
 				$scope.newUser.email = $scope.user.email;
 				$scope.newUser.instance = instance;
 				$scope.newUser.username = $scope.user.email;
 				$scope.newUser.data.roles = 1;
 				$scope.newUser.data.profile.field_want_to_appear_in_director = $scope.userChoice;
 										
-				//alert(JSON.stringify($scope.newUser));
 				AuthService.registerUser($scope.newUser).success(function(res){
 					$rootScope.currentUser = res;
 					$window.localStorage.setItem('user',JSON.stringify($rootScope.currentUser));
@@ -415,18 +395,15 @@ launchpad.controller("SignupController",function($scope,AuthService,$rootScope,$
 					$scope.successmsg = 'Registered Successfully';
 					$scope.errormsg.length = 0;
 					$scope.loading = false;
-					//fbloader_stop();
 					$scope.locationRedirect('profile');
 				})
 				.error(function(err){
 				 	$scope.errormsg.push({label:'User Creation failed.. Please Try Again'});
 				 	$scope.successmsg = '';
 				 	$scope.loading = false;
-				 	//fbloader_stop();
 				});
 			} else {
 				$scope.errormsg.push({label:'Your email addresses do not match. Please check and confirm your email address'});
-				//fbloader_stop();
 			}
 		}
 		else {
@@ -451,11 +428,11 @@ launchpad.controller("ProfileController",function($scope,$window,$rootScope) {
 	if($window.localStorage.getItem('user') == null){
 		$scope.locationRedirect('users/login');
 	}
-	if($rootScope.profile.field_ask_me_about){
-			$scope.Exp = $rootScope.setUserChoice($rootScope.profile.field_ask_me_about.target_id);
+	if($rootScope.profile.field_ask_me_about_6){
+			$scope.Exp = $rootScope.setUserChoice($rootScope.profile.field_ask_me_about_6);
 	}
-	if($rootScope.profile.field_i_m_interested_in){
-			$scope.Int = $rootScope.setUserChoice($rootScope.profile.field_i_m_interested_in.target_id);
+	if($rootScope.profile.field_i_m_interested_in_5){
+			$scope.Int = $rootScope.setUserChoice($rootScope.profile.field_i_m_interested_in_5);
 	}
 	
 });
@@ -478,21 +455,30 @@ launchpad.controller("EditProfileController",function($scope,$rootScope,$window,
 	$scope.updatePF.field_organisation = $rootScope.profile.field_organisation;
 	$scope.updatePF.field_want_to_appear_in_director = $rootScope.profile.field_want_to_appear_in_director;
 	
-	$scope.editUser.field_i_m_interested_in = {};
-	if($rootScope.profile.field_i_m_interested_in){
-		$scope.editUser.field_i_m_interested_in.id = $rootScope.profile.field_i_m_interested_in.target_id;
-	}else {
-		$scope.editUser.field_i_m_interested_in = $rootScope.topics[0];
-	}
+	$scope.editUser.field_i_m_interested_in = [];
+	$scope.editUser.field_ask_me_about = [];
 
-	$scope.editUser.field_ask_me_about = {};
-
-	if($rootScope.profile.field_ask_me_about){
-		$scope.editUser.field_ask_me_about.id = $rootScope.profile.field_ask_me_about.target_id;
-	}else {
-		$scope.editUser.field_ask_me_about = $rootScope.topics[0];
-	}
 	
+	//for new field i_m_interested_in
+    if ($rootScope.profile.field_i_m_interested_in_5 === null && $rootScope.profile.field_ask_me_about_6 === null) {
+      $scope.temp_interested_in = [];
+      $scope.temp_ask_me_about = [];
+    }
+    else {
+      $scope.temp_interested_in = $rootScope.profile.field_i_m_interested_in_5;
+      $scope.temp_ask_me_about = $rootScope.profile.field_ask_me_about_6;
+
+    }
+    $scope.availabilityCheck = function () {
+      for (var i = 0; i < $scope.temp_interested_in.length; i++){
+      	$scope.editUser.field_i_m_interested_in.push({value:$scope.temp_interested_in[i]});
+      }
+      for (var i = 0; i < $scope.temp_ask_me_about.length; i++){
+      	$scope.editUser.field_ask_me_about.push({value:$scope.temp_ask_me_about[i]});
+      }
+    };
+
+    $scope.availabilityCheck();  
 	
 	$scope.updatePF.field_twitter = {};
 	if($rootScope.profile.field_twitter){
@@ -507,10 +493,9 @@ launchpad.controller("EditProfileController",function($scope,$rootScope,$window,
 			$scope.errormsg = '';
 			$scope.successmsg = '';
 			$scope.loading = true;
-			//fbloader_start();
-			$scope.updatePF.field_i_m_interested_in = $scope.setDataToUpdate($scope.editUser.field_i_m_interested_in);
-			$scope.updatePF.field_ask_me_about = $scope.setDataToUpdate($scope.editUser.field_ask_me_about);
 			
+			 $scope.updatePF.field_i_m_interested_in_5 = $scope.setDataToUpdate($scope.editUser.field_i_m_interested_in);
+			 $scope.updatePF.field_ask_me_about_6 = $scope.setDataToUpdate($scope.editUser.field_ask_me_about);
 			AuthService.updateUser($scope.updatePF).success(function(res){
 		     	$rootScope.profile = UpdatedUser.get({pid:$rootScope.currentUser.profile.pid,api_key:$rootScope.currentUser.api_token});
 		     	$rootScope.profile.$promise.then(function(){
@@ -518,14 +503,12 @@ launchpad.controller("EditProfileController",function($scope,$rootScope,$window,
 		     		$scope.successmsg = 'Profile updated Successfully';
 		 			$scope.errormsg = '';
 		 			$scope.loading = false;
-		 			//fbloader_stop();
 		 			$scope.locationRedirect('profile');
 		     	});
 		     	
 			 }).error(function(err){
 			   	$scope.errormsg = 'Updation Failed';
 			   	$scope.loading = false;
-			   	//fbloader_stop();
 			});
 		 	
 		} else {
@@ -559,7 +542,6 @@ launchpad.controller('ForgotPasswordController',function($scope){
 
 launchpad.controller('ContactController',function($scope,$routeParams,UpdatedUser,$http,$rootScope){
 	$scope.loading = true;
-	//fbloader_start();
 	$scope.mailData = {};
 	$scope.contactUser = UpdatedUser.get({pid:$routeParams.pid,api_key:API_KEY});
 	$scope.contactUser.$promise.then(function(){
@@ -567,14 +549,12 @@ launchpad.controller('ContactController',function($scope,$routeParams,UpdatedUse
 	 	$scope.mailData.email = $scope.contactUser.mail;
 	 	$scope.mailData.sender = $rootScope.profile.mail;
 	 	$scope.loading = false;
-	 	//fbloader_stop();
 	});
 	$scope.errormsg = '';
 	$scope.successmsg = '';
 	$scope.sendMail = function(contactForm){
 		if(contactForm.$valid){
 			$scope.loading = true;
-			//fbloader_start();
 			$http({
 			method : "POST",
 			url : "views/email.php",
@@ -587,7 +567,6 @@ launchpad.controller('ContactController',function($scope,$routeParams,UpdatedUse
 			// $scope.successmsg = res.message+' to '+$scope.mailData.mailTo;
 			// $scope.errormsg = '';
 			$scope.loading = false;
-			//fbloader_stop();
 
 		}).error(function(err){
 			$scope.errormsg = 'E-Mail not sent ';
@@ -596,7 +575,6 @@ launchpad.controller('ContactController',function($scope,$routeParams,UpdatedUse
 			// $scope.errormsg = err.message+' Please try again..!';
 			// $scope.successmsg = '';
 			$scope.loading = false;
-			fbloader_stop();
 		});
 		
 
@@ -615,15 +593,13 @@ launchpad.controller('ContactController',function($scope,$routeParams,UpdatedUse
 
 launchpad.controller('CategoryDetailController',function($scope,$routeParams,$rootScope,ListUsers){
 	
-	//fbloader_start();
+	$scope.loading = true;
 	$scope.catId = $routeParams.tid;
 	$rootScope.allUsers = ListUsers.query();
 	$rootScope.allUsers.$promise.then(function(){
 		$scope.getCategoryUserByExperience($scope.catId);
 		$scope.getCategoryUserByInterest($scope.catId);
-		
-		//fbloader_stop();
-
+        $scope.loading = false;
 	});
 
 });
