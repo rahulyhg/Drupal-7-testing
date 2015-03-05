@@ -1,0 +1,28 @@
+    <div id="login-container" class="dialogbox-container" ng-if="!isLogin">
+
+      <div class="login-header">
+        <div class="logo"><img src="img/logo.png" alt="Imtrade" /></div>
+        <div class="slogan">Sign in to connect</div>
+      </div>     
+      <div class="loadingBar" ng-if="loading"></div> 
+      <div ng-if="errormsg" class="notificationmsg error">{{errormsg}}</div>
+	<form name="loginForm" ng-submit="doLogin(loginForm)" novalidate>
+      <div class="login-content">
+        <div class="form-item form-type-textfield">
+          <input tabindex="1" type="text" name="username" id="edit-name" class="form-text" placeholder="Username" ng-model="credentials.username" required>
+        </div>
+        <div class="form-item form-type-textfield">
+          <input tabindex="1" type="password" name="password" id="edit-password" class="form-text" placeholder="Password" ng-model="credentials.password" required>
+        </div>
+        <div class="form-item form-type-checkbox">
+          <input tabindex="1" id="edit-remember-me"  name="rememberme" class="form-checkbox" type="checkbox" 
+          ng-model="rememberMe" checked="rememberMe" ng-change="setRememberMe()">
+          <span>Remember me </span>
+        </div>
+        <div class="form-item form-type-submit"><input tabindex="1" id="edit-submit" name="log_in" value="Log in" class="form-submit" type="submit"></div>
+	</form>
+        <div class="forgot-password"><a href="#" ng-click="openForgotpasswordDailogBox()">Forgot Password ?</a></div>
+        <div class="create-an-account"><a href="#" class="button" ng-click="openUserregisterDailogBox()">Create an account</a></div>
+      </div><!--- end /.login-content --->
+
+    </div><!--- end /#login-container --->

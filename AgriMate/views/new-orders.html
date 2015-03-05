@@ -1,0 +1,71 @@
+    <div id="order-container" class="dialogbox-container">
+
+      <h2 class="title">Request a Quote</h2>
+      <div class="loadingBar" ng-if="loading1"></div>
+       <div class="notificationmsg error" ng-if="errormsg">{{errormsg}}</div>
+      <div class="notificationmsg success" ng-if="successmsg">{{successmsg}}</div>
+
+      <div class="order-content">
+	  <form name="newOrderForm" ng-submit="newOrderItem(orderItem)" novalidate>
+		<div class="form-item form-type-textfield">
+          <label>Quote Name</label>
+          <input tabindex="1" type="text" name="productname" id="edit-product-name" 
+		  class="form-text" ng-model="orderdata.name" placeHolder="--Your order reference number--">
+        </div>
+		<div class="form-item form-type-textfield">
+          <label>Quote Notes</label>
+          <input tabindex="1" type="text" name="productname" id="edit-product-name" 
+		  class="form-text" ng-model="orderdata.notes" placeHolder="--Special delivery instructions--">
+        </div>
+	  <hr>
+        <div class="form-item form-type-textfield">
+          <label>Product Name</label>
+          <input tabindex="1" type="text" name="productname" id="edit-product-name" 
+		  class="form-text" ng-model="orderItem.productname">
+        </div>
+        <div class="form-item form-type-textfield">
+          <label>Quantity</label>
+          <input tabindex="1" type="text" name="quantity" id="edit-quantity"
+		  class="form-text" ng-model="orderItem.quantity">
+        </div>
+        <div class="form-item form-type-select">
+          <label>Unit</label>
+          <select id="edit-unit" name="unit" class="form-select" ng-model="orderItem.unit">
+			<option value="1" selected="true">Kg</option>
+			<option value="3">Ltr</option>
+			<option value="2">Mtr</option>
+		  </select>
+        </div>
+        <div class="form-item form-type-submit"><input tabindex="1" id="edit-submit" name="add" value="ADD" 
+		class="form-submit" type="submit"></div>
+		</form>
+      </div><!-- end order-content -->
+
+
+      <div class="order-list nopbox">
+	  <div ng-repeat="item in order">
+        <div class="teaser">
+          <div class="close-button" ng-click="removeItem($index)">X</div>
+          <div class="nopimg order-img"></div>
+          <div class="description">
+            <p>{{item.name}}</p>
+            <div class="qty-unit">
+				<span class="qty">Qty: 
+				<strong>{{item.qty}}</strong></span>
+			<span class="unit" ng-switch="item.unit">Unit: 
+				<strong ng-switch-when="1">Kg</strong>
+				<strong ng-switch-when="2">Mtr</strong>
+				<strong ng-switch-when="3">Ltr</strong>
+			</span>
+			</div>
+          </div>
+        </div>
+		</div>
+
+     <div class="form-actions">
+       <div class="submit-for-quote"><input tabindex="1" id="edit-submit-for-quote" name="add" value="Submit for quote"
+	   class="form-submit" type="button" ng-click="subminForQuote()"></div>
+       <div class="close-button"><a href="#" class="button grey" ng-click="closeOrderPop()">Close</a></div>
+     </div>
+
+    </div><!--- end /#order-container --->

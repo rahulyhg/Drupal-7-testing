@@ -1,0 +1,31 @@
+            <div class="add-order-button"><a href="#/order-details/{{orderId}}" ng-click="openNeworderTemplate()" class="button">ADD ORDER</a></div>
+            <div ng-include src="'views/recent-orders.html'"></div>
+            <div id="order-detail" class="nopbox"><div class="inner">
+              <h2 class="title">Order Detail</h2>
+			  <div class="loadingBar" ng-if="loading"></div> 
+              <div class="teaser" ng-repeat="value in items">
+                <div class="nopimg order-img"></div>
+                <div class="description">
+                  <p>{{value.field_item_name}}</p>
+                  <div class="qty-unit">
+                    <span class="qty">Qty: <strong>{{value.field_quantity}}</strong></span>	  
+				    <span class="unit" ng-switch="value.field_units">Unit: 
+					  <strong ng-switch-when="1">Kg</strong>
+					  <strong ng-switch-when="2">Mtr</strong>
+					  <strong ng-switch-when="3">Ltr</strong>
+				    </span>
+				  </div>
+				  <div class="quoted-section" ng-if="value.field_quoted_amount!=null">
+                    <h2 class="unit"><strong>Quoted: ${{value.field_quantity * value.field_quoted_amount}}</strong></h2>
+                    <span class="unit" ng-if="value.field_status_6!=3 && value.field_status_6!=4"> <a ng-click="cirfimOrderDetails(orderId,value.id)" class="button small">Confirm</a></span>
+                    <span class="unit" ng-if="value.field_status_6!=3 && value.field_status_6!=4"> <a ng-click="cancelOrderDetails(orderId,value.id)" class="button small orange">Cancel</a></span>
+                    
+                    <span class="unit" ng-switch="value.field_status_6" ng-if="value.field_status_6==3 || value.field_status_6==4">
+                      <strong ng-switch-when="3">Quoted Confirm</strong>
+                      <strong ng-switch-when="4">Cancelled</strong>
+                    </span>
+                </div>
+              </div>
+            </div> 
+            </div>
+            </div>

@@ -1,0 +1,31 @@
+<td>{{value.field_order}}</td>
+            <td>{{value.field_order_name}}</td>
+            _none
+            <td ng-switch-when="1">Submitted for quote</td>
+            <td ng-switch-when="2">Quoted</td>
+            <td ng-switch-when="3">Quote Confirmed</td>
+            <td ng-switch-when="4">Cancelled</td>
+
+
+
+             The confirm (or accept) and cancel (or reject) button should show for the end user once there is a quoted amount.
+
+ 
+
+E.g.
+
+ 
+
+-          If Order Item.Quoted Amount != “”
+
+-          AND if Order Item.Status != “Quote Confirmed” OR “Cancelled”
+
+-          Then show buttons Accept | Reject
+
+-          If user clicks Accept -> Order Item.Status = Quote Confirmed
+
+-          If user clicks Reject -> Order Item.Status = Cancelled
+
+-          If Order Item.Status = “Quote Confirmed” OR “Cancelled”
+
+-          Then show text (not editable) ‘Item Confirmed’ OR ‘Item Cancelled

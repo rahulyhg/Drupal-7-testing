@@ -1,0 +1,62 @@
+    <div id="profile-container" ng-if="isLogin">
+
+      <h2 class="title">Your Profile</h2>
+      <div class="profile-content">
+        <div class="form-item">
+          <label>First Name</label>
+          <p>{{userProfile.field_first_name}}</p>
+        </div>
+        <div class="form-item">
+          <label>Last Name</label>
+          <p>{{userProfile.field_last_name}}</p>
+        </div>
+        <div class="form-item">
+          <label>Email</label>
+          <p>{{userProfile.field_email}}</p>
+        </div>
+        <div class="form-item">
+          <label>Phone/Mobile</label>
+          <p>{{userProfile.field_phone_mobile.number}}</p>
+        </div>
+        <div class="form-item">
+          <label>ABN</label>
+          <p>{{userProifle.field_abn}}</p>
+        </div>
+        <div class="form-item">
+          <label><b>Delivery Address:</b></label>
+            <div class="form-item">
+              <label>Country</label>
+              <p>{{userProfile.field_address_3.country}}</p>
+            </div>
+            <div class="form-item">
+              <label>Address 1</label>
+              <p>{{userProfile.field_address_3.thoroughfare}}</p>
+            </div>
+            <div class="form-item">
+              <label>Address 2</label>
+              <p>{{userProfile.field_address_3.premise}}</p>
+            </div>
+            <div class="form-item">
+              <label>City</label>
+              <p>{{userProfile.field_address_3.locality}}</p>
+            </div>
+            <div class="form-item">
+              <label>State</label>
+              <p>{{userProfile.field_address_3.administrative_area}}</p>
+            </div>
+            <div class="form-item">
+              <label>Postal Code</label>
+              <p>{{userProfile.field_address_3.postal_code}}</p>
+            </div>
+            <div class="form-item">
+              <label>Preferred Transport</label>
+              <p>{{userProflie.field_preferred_transport}}</p>
+            </div>  
+        </div>
+        
+        <div>
+          <input type="button"  value='Edit' ng-click="editProfile()">
+        </div>
+      </div><!--- end /.profile-content --->
+
+    </div><!--- end /#profile-container --->

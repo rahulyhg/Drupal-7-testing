@@ -1,0 +1,20 @@
+    <div id="invoice-history-container" ng-if="isLogin">
+      <div id="invoice-history-detail" class="nopbox"><div class="inner">
+        <h2 class="title">Invoice History</h2>
+        <div class="teaser">
+ 		  <table>
+ 			<tr>
+ 				<th>Invoice #</th><th>Date</th><th>Description</th><th>Amount</th>
+				<div class="loadingBar" ng-if="loading"></div> 
+ 			</tr>
+ 			<tr ng-repeat="value in invoices">
+ 				<td>{{value.field_invoice_number}}</td><td>{{value.created * 1000 | date:'mediumDate'}}</td>
+ 				<td>{{value.field_invoice_description}}</td><td>${{value.field_amount}}</td>
+ 			</tr>
+ 			<tr ng-if="invoices == 0">
+ 				<td colspan="4">Empty</td>
+ 			</tr>
+ 		  </table>
+        </div><!--- end /.teaser --->
+      </div></div>
+    </div><!--- end /#invoice-history-container --->
